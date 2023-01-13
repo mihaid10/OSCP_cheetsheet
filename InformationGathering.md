@@ -156,7 +156,29 @@ net user
   net user admin Ev!lpass
   ```
   
+* ローカルグループの表示
+
+  ```
+  net localgroup
+  ```
+
+* ローカルグループのメンバーの表示
+
+  ```
+  net localgroup Administrators
+  ```
+
   
+
+* グローバルなグループの表示
+
+  ```
+  net group
+  ```
+
+  ![image-20230113074128746](img/InformationGathering/image-20230113074128746.png)
+
+  https://atmarkit.itmedia.co.jp/ait/articles/0609/02/news014_2.html#_ga=2.160874941.1084612904.1673563106-525287863.1651237399
 
 
 

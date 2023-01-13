@@ -65,3 +65,11 @@ $hash1 -eq $hash2
 
 
 
+### ポートスキャン
+
+```
+for($i=1; $i -le 140; $i++){
+	Test-NetConnection 172.50.3.1 -Port $i
+}
+```
+

