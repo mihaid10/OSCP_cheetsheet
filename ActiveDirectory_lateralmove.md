@@ -1,6 +1,6 @@
 ### Pass the Hash
 
-* Kerberos 認証では動作せず、NTLM 認証を用いたサーバやサービスでのみ動作する
+* Kerberos 認証では動作せず、NTLM 認証を用いたサーバやサービスでのみ動作する。
 
 * ファイアウォールを介したSMB接続（通常はポート445）と、Windowsのファイルおよびプリント共有機能が有効であることが必要
 
@@ -9,6 +9,12 @@
   (@byt3bl33d3r, 2015), https://github.com/byt3bl33d3r/pth-toolkit [↩︎](https://portal.offensive-security.com/courses/pen-200/books-and-videos/modal/modules/active-directory-attacks/active-directory-lateral-movement/pass-the-hash#fnref2)
 
   (Core Security, 2017), https://github.com/CoreSecurity/impacket/blob/master/examples/smbclient.py 
+
+* 管理共有(445)が有効であることの確認（windows clientの場合)
+
+  ```cmd
+  net share
+  ```
 
 * #### pth-winexe(kaliから横展開)
 
@@ -269,3 +275,4 @@ API である DCOM サービスコントロールマネージャを呼び出す�
   ```
 
   
+

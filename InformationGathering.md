@@ -168,8 +168,6 @@ net user
   net localgroup Administrators
   ```
 
-  
-
 * グローバルなグループの表示
 
   ```
@@ -179,8 +177,20 @@ net user
   ![image-20230113074128746](img/InformationGathering/image-20230113074128746.png)
 
   https://atmarkit.itmedia.co.jp/ait/articles/0609/02/news014_2.html#_ga=2.160874941.1084612904.1673563106-525287863.1651237399
+  
+* ログインユーザのSID確認
 
+  ```
+  whoami /user
+  ```
 
+* 管理共有の確認
+
+  ```
+  net share
+  ```
+
+  
 
 ## linux
 

