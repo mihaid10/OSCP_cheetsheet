@@ -304,9 +304,7 @@ API である DCOM サービスコントロールマネージャを呼び出す�
 * Ports: 445/TCP(SMB)
 * Required Group Memberships：Administrators
 
-```
-psexec64.exe \\MACHINE_IP -u Administrator -p Mypass123 -i cmd.exe
-```
+![image-20230118224129844](C:\Users\nflabs-03\AppData\Roaming\Typora\typora-user-images\image-20230118224129844.png)
 
 
 
@@ -399,5 +397,3 @@ schtasks /s TARGET /run /TN "THMtask1"
 ```cmd
 schtasks /S TARGET /TN "THMtask1" /DELETE /F
 ```
-
-#### 
