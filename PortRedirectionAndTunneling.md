@@ -39,6 +39,10 @@ ssh -N -L [bind_address:]port:host:hostport [username@address]
 sudo ssh -N -L 0.0.0.0:445:172.16.250.5:445 student@192.168.250.44
 ```
 
+バインドが通信の転送元。自分が受けた通信を相手に送りたいときはローカルポートフォワードを行う
+
+![image-20230122184847090](img/PortRedirectionAndTunneling/image-20230122184847090.png)
+
 ![image-20230107094644743](img/PortRedirectionAndTunneling/image-20230107094644743.png)
 
 * 自分自身にsshしてポートフォーワードする方法
@@ -57,6 +61,10 @@ sudo ssh -N -L 0.0.0.0:445:172.16.250.5:445 student@192.168.250.44
 ssh -N -R [bind_address:]port:host:hostport [username@address]
 ssh -N -R 192.168.119.250:2221:127.0.0.1:3306 kali@192.168.119.250
 ```
+
+![image-20230122190653103](img/PortRedirectionAndTunneling/image-20230122190653103.png)
+
+リモートポートフォワードはローカルポートフォワードの逆。リモートホストでリッスンしているポートが受けた通信を自分自身のポートに転送させたいときに利用する。
 
 ![image-20230107103409045](img/PortRedirectionAndTunneling/image-20230107103409045.png)
 
@@ -84,6 +92,15 @@ ssh -N -R 192.168.119.250:2221:127.0.0.1:3306 kali@192.168.119.250
   ↑イメージの参考になるサイト
 
 
+
+##### パターン3：オプション付き
+
+```bash
+ssh -R 1122:10.5.5.11:22 -R 13306:10.5.5.11:3306 -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" kali@192.168.119.158
+```
+
+* UserKnownHostsFile=/dev/null ：出力を /dev/null に送ることで、 ssh がホスト鍵を保存しようとするのを防ぐ
+* StrictHostKeyChecking=no：ホスト鍵を受け入れるかどうかのプロンプトを表示しないように ssh に指示
 
 ### SSH Dynamic Port Forwarding
 
@@ -130,6 +147,28 @@ sock4でfoxyproxyを設定する
 ![image-20230108171303939](img/PortRedirectionAndTunneling/image-20230108171303939.png)
 
 ※またアクセスするときはローカルホストや127.0.0.1などではなく、攻撃対象ホストの内部ホストのIPアドレスを正しく指定する必要がある。
+
+#### パート2  -Rでやる場合
+
+```bash
+ssh -f -N -R 1080 -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -i /var/lib/mysql/.ssh/id_rsa kali@192.168.119.153
+```
+
+```
+sudo vi /etc/proxychains.conf
+```
+
+![image-20230126231247288](img/PortRedirectionAndTunneling/image-20230126231247288.png)
+
+```
+proxychains nmap --top-ports=20 -sT -Pn 10.5.5.20
+```
+
+以下をいじれば高速化できるが失敗する可能性も高くなる
+
+![image-20230126231358762](img/PortRedirectionAndTunneling/image-20230126231358762.png)
+
+
 
 ### Plink.exe(windows)
 

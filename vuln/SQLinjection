@@ -97,3 +97,26 @@ https://www.exploit-db.com/papers/12975
 ```
 
 SQLが上記のサンプルコードで刺さればAuthentication bypassをすることも可能な場合もある
+
+
+
+### MariaDB(MySQL DB)
+
+ログイン
+
+```
+mysql --host=127.0.0.1 --port=13306 --user=wp -p
+```
+
+権限の確認
+
+```
+SHOW Grants;
+```
+
+変数の確認
+
+```
+show variables;
+```
+

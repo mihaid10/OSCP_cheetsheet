@@ -73,3 +73,46 @@ for($i=1; $i -le 140; $i++){
 }
 ```
 
+
+
+### リモートホスト操作
+
+* ホスト名の確認
+
+```cmd
+nslookup
+> set type=all
+> _ldap._tcp.dc._msdcs.sandbox.local
+
+_ldap._tcp.dc._msdcs.sandbox.local      SRV service location:
+          priority       = 0
+          weight         = 100
+          port           = 389
+          svr hostname   = SANDBOXDC.sandbox.local
+```
+
+* セッションを作成する
+
+```powershell
+$dcsesh = New-PSSession -Computer SANDBOXDC
+```
+
+* コマンド実行する
+
+  ```powershell
+  Invoke-Command -Session $dcsesh -ScriptBlock {ipconfig}
+  ```
+
+* ファイルをコピーする
+
+  ```powershell
+  Copy-Item "C:\Users\Public\whoami.exe" -Destination "C:\Users\Public\" -ToSession $dcsesh
+  ```
+
+* ファイルを実行する
+
+  ```powershell
+  Invoke-Command -Session $dcsesh -ScriptBlock {C:\Users\Public\whoami.exe}
+  ```
+
+  

@@ -30,6 +30,17 @@ kali@kali:~$ grep Up ping-sweep.txt | cut -d " " -f 2
 
 
 
+### ポートスキャン
+
+```
+sudo nmap -sC -sS -p0-65535 sandbox.local
+```
+
+* -sC：デフォルトのスクリプトセット
+* -sS：時間を短縮するためのSYNスキャン
+
+
+
 ### ポートを指定してSweep
 
 ```bash
@@ -94,4 +105,8 @@ nmap 10.11.1.220 --script=smb-os-discovery
 ```bash
 kali@kali:~$ sudo nmap --script vuln 10.11.1.10
 ```
+
+
+
+適正なイーサネット接続の環境にいる場合は`-T4`オプションを付与することでnmapの高速化が期待できる
 

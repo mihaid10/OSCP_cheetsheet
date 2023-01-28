@@ -266,7 +266,7 @@ hostname
 
   ```
    ls -lah /etc/cron* 
-   cat /etc/crontab]
+   cat /etc/crontab
    cat /var/log/cron.log
   ```
 

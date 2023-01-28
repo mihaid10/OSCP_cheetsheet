@@ -10,3 +10,7 @@
 '>"><hr>
 ```
 
+```
+'>"><script>alert("Hello")</script>
+```
+
