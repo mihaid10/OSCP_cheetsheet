@@ -17,3 +17,9 @@ C:\Program Files\My Program\My service\service.exe
 
 `Program Files`配下は書き込み権限がない場合が多く、ソフトウェアのメインディレクトリ（`C:\Program Files\My Program`）やサブディレクトリ（`C:\Program Files\My Program\My service`）が誤って設定され、悪意のある My.exe バイナリを仕込むことができる可能性が⾼くなる。
 
+
+
+```
+icacls "C:\Program Files\Serviio\bin\ServiioService.exe"
+```
+

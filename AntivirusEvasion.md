@@ -1,12 +1,18 @@
 # AntivirusEvasion
 
+ファイル名を変更するだけでも効果がある場合がある
+
+
+
+
+
 ### PowerShell In-Memory Injection
 
 powershellスクリプトを記述する。AVで検知される。kaliの以下に格納した。
 
 ```bash
 ┌──(kali㉿kali)-[~/Documents/tools/powershell]
-└─$ ls                                                                im-memory.ps1
+└─$ ls im-memory.ps1
 ```
 
 ![image-20230105133939946](img/AntivirusEvasion/image-20230105133939946.png)

@@ -4,6 +4,7 @@
 
 ```bash
 python* -c 'import pty; pty.spawn("/bin/sh")'
+python2 -c 'import pty; pty.spawn("/bin/bash")'
 ```
 
 ※*にはバージョンを入れる

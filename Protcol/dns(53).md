@@ -26,16 +26,36 @@
 
 * キャッシュサーバー：リゾルバサーバーと同義
 
+### IPアドレス群からDNSサーバを見つけゾーン情報列挙
 
+* nmapで53ポートをOPENしているサーバーを見つける
 
-### ドメイン情報収集(dnsrecon)
+  ```
+  nmap -sC -p53 192.168.175.0/24
+  ```
 
-```bash
-dnsrecon -d megacorpone.com -t axfr
+  [ルートサーバー](https://www.google.co.jp/search?q=root-servers.net+%E3%81%A8%E3%81%AF&sxsrf=ALiCzsajjF5dt8N_-UocYYyhBJnscmLzOw%3A1672186899697&source=hp&ei=E4yrY5_DKISk2roPuLWb8AI&iflsig=AJiK0e8AAAAAY6uaI9FRW43cS5rasYpBQDN4QSWCrn56&oq=root-servers.net.&gs_lcp=Cgdnd3Mtd2l6EAEYATIJCAAQgAQQDRATMgkIABAeEPEEEBMyCQgAEB4Q8QQQEzIJCAAQHhDxBBATMgkIABAeEPEEEBMyCAgAEB4QDRATMg0IABAFEB4Q8QQQChATMgsIABAFEB4Q8QQQEzILCAAQBRAeEPEEEBMyCwgAEAUQHhDxBBATUABYAGDgEmgAcAB4AIABYogBYpIBATGYAQCgAQKgAQE&sclient=gws-wiz)
 
-# ドメインリスト攻撃
-dnsrecon -d megacorp.com -D ./list.txt -t brt 
-```
+* DNSサーバーを見つけたらドメイン名を取得する
+
+  ```bash
+  host <サーバーのip> <dnsサーバーのip>
+  ```
+
+  ```
+  for ip in $(seq 1 254); do host 10.11.1.$ip 10.11.1.220; done | grep -v "not found" | column -t
+  ```
+
+  not found: 3(NXDOMAIN)：ホスト名が存在しない
+
+* ゾーン情報要求する
+
+  ```
+  dig axfr <ドメイン名> @<dnsサーバーのip>
+  ```
+
+  * AXFR：すべてのゾーン情報を同期
+  * IXFR：差分転送
 
 ### ドメイン情報収集（dig)
 
@@ -56,10 +76,15 @@ $ host -t ns megacorpone.com | cut -d " " -f 4
 # ゾーン情報要求
 $ host -l megacorpone.com ns2.megacorpone.com
 $ host -l <ドメイン名> <ネームサーバー名>
+```
 
-# 逆引き
-for ip in $(seq 50 100); do host 51.222.169.$ip; done | grep -v "not found"
-# ※逆引きはゾーン情報のPTRにIPアドレスの記載がない限りヒットしない。
+### ドメイン情報収集(dnsrecon)
+
+```bash
+dnsrecon -d megacorpone.com -t axfr
+
+# ドメインリスト攻撃
+dnsrecon -d megacorp.com -D ./list.txt -t brt 
 ```
 
 ### ドメイン情報収集 (DNSenum)
@@ -70,41 +95,12 @@ for ip in $(seq 50 100); do host 51.222.169.$ip; done | grep -v "not found"
 dnsenum zonetransfer.me
 ```
 
-
-
 ### nmap script
 
 ```bash
 nmap --script=dns-zone-transfer -p 53 ns2.megacorpone.com
 nmap --script=dns-zone-transfer -p 53 <ネームサーバ>
 ```
-
-
-
-### IPアドレス群からDNSサーバを見つけゾーン情報列挙
-
-* nmapで53ポートをOPENしているサーバーを見つける
-
-  ```
-  nmap -sC -p53 192.168.175.0/24
-  ```
-
-  [ルートサーバー](https://www.google.co.jp/search?q=root-servers.net+%E3%81%A8%E3%81%AF&sxsrf=ALiCzsajjF5dt8N_-UocYYyhBJnscmLzOw%3A1672186899697&source=hp&ei=E4yrY5_DKISk2roPuLWb8AI&iflsig=AJiK0e8AAAAAY6uaI9FRW43cS5rasYpBQDN4QSWCrn56&oq=root-servers.net.&gs_lcp=Cgdnd3Mtd2l6EAEYATIJCAAQgAQQDRATMgkIABAeEPEEEBMyCQgAEB4Q8QQQEzIJCAAQHhDxBBATMgkIABAeEPEEEBMyCAgAEB4QDRATMg0IABAFEB4Q8QQQChATMgsIABAFEB4Q8QQQEzILCAAQBRAeEPEEEBMyCwgAEAUQHhDxBBATUABYAGDgEmgAcAB4AIABYogBYpIBATGYAQCgAQKgAQE&sclient=gws-wiz)
-
-* DNSサーバーを見つけたらドメイン名を取得する
-
-  ```bash
-  host <dnsサーバーのip> <dnsサーバーのip>
-  ```
-
-* ゾーン情報要求する
-
-  ```
-  dig axfr <ドメイン名> @<dnsサーバーのip>
-  ```
-
-  * AXFR：すべてのゾーン情報を同期
-  * IXFR：差分転送
 
 ### resolve.conf編集
 

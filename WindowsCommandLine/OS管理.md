@@ -13,3 +13,19 @@ shutdown /r /t 0
 net stop Serviio
 ```
 
+
+
+### ファイル検索
+
+```
+C:\>dir /s /b | findstr reverse
+```
+
+
+
+### ファイル移動
+
+```
+move memo.txt C:\test\back
+```
+

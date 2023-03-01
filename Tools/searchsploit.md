@@ -19,3 +19,9 @@ ls -1 /usr/share/exploitdb/
 searchsploit
 ```
 
+### DB更新
+
+```
+searchsploit -u
+```
+

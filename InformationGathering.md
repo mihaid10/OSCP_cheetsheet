@@ -65,6 +65,7 @@ net user
   ```
   netsh advfirewall show currentprofile
   netsh advfirewall firewall show rule name=all
+  netsh advfirewall firewall show rule name=cmd
   ```
 
 * スケジュールタスクの表示

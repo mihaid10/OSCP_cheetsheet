@@ -8,3 +8,7 @@ done
 echo "Done"
 ```
 
+```
+for i in {1..10}; do echo 10.11.1.$i;done
+```
+

