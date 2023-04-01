@@ -10,7 +10,8 @@
 
   ```bash
   find . -iname '*config*'
+  find . -iname '*pass*'
   ```
-
+  
   
 
