@@ -139,11 +139,10 @@ crowbar -b rdp -s 10.11.0.22/32 -u admin -C ~/password-file.txt -n 1
 ## ハッシュ種類の特定
 
 ```bash
-hashid c43ee559d69bc7f691fe2fbfe8a5ef0a
 hashid '$6$l5bL6XIASslBwwUD$bCxeTlbhTH76wE.bI66aMYSeDXKQ8s7JNFwa1s1KkTand6ZsqQKAF3G0tHD9bd59e5NAz/s7DQcAojRTWNpZX0'
 ```
 
-
+※ハッシュは必ず`''`で囲むこと！
 
 ## John the ripper
 

