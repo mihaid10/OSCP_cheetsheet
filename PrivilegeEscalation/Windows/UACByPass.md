@@ -1,5 +1,71 @@
 # UACByPass
 
+* [情報収集](#情報収集)
+* [fodhelper.exe](#fodhelper.exe)
+* [UACME](#UACME)
+* [Empire powershell](#Empire powershell)
+
+### 情報収集
+
+* Administrator group(`BUILTIN\Administrators`)で整合性レベル`medium`あることを確認
+
+  ```
+  whoami /groups 
+  ```
+
+* UAC設定の確認
+
+  ```powershell
+  Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System | Select-Object EnableLUA
+  
+  EnableLUA
+  ---------
+  1
+  
+  # check behavior 
+  Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System | Select-Object ConsentPromptBehaviorAdmin
+  
+  ConsentPromptBehaviorAdmin
+  --------------------------
+  5
+  ```
+
+  ```cmd
+  # 1：UAC有効、0または存在しない場合はUACが非有効
+  REG QUERY HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ /v EnableLUA
+  
+      EnableLUA    REG_DWORD    0x1
+  ```
+
+  ```
+  REG QUERY HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ /v ConsentPromptBehaviorAdmin
+  
+      ConsentPromptBehaviorAdmin    REG_DWORD    0x5
+  ```
+
+  https://book.hacktricks.xyz/windows-hardening/authentication-credentials-uac-and-efs/uac-user-account-control
+
+  
+
+* 自動昇格するプロセスの確認
+
+  ```cmd
+  cd c:\windows\
+  strings –s *.exe | findstr /i autoelevate
+  ```
+
+  https://learn.microsoft.com/ja-jp/sysinternals/downloads/strings
+
+  ```
+  sigcheck.exe -accepteula -m C:\Windows\System32\dccw.exe
+  ```
+
+  ![image-20230202192734371](img/UACByPass/image-20230202192734371.png)
+
+
+
+
+
 ### fodhelper.exe
 
 オペレーティングシステムの言語変更を管理するMicrosoftのサポートアプリケーションであるfodhelper.exeを利用したUACbyPass.

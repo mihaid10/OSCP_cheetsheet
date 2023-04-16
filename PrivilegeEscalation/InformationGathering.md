@@ -153,12 +153,18 @@ net user
   whoami /groups
   ```
 
+* 特権の確認
+
+  ```
+  whoami /priv
+  ```
+
 * ユーザのパスワード変更
 
   ```
   net user admin Ev!lpass
   ```
-  
+
 * ローカルグループの表示
 
   ```
@@ -180,7 +186,7 @@ net user
   ![image-20230113074128746](img/InformationGathering/image-20230113074128746.png)
 
   https://atmarkit.itmedia.co.jp/ait/articles/0609/02/news014_2.html#_ga=2.160874941.1084612904.1673563106-525287863.1651237399
-  
+
 * ログインユーザのSID確認
 
   ```

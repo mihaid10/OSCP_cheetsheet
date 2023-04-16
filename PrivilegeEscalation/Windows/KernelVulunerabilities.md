@@ -24,7 +24,10 @@ systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
   driverquery /v
   ```
 
-  ![image-20230106101933372](img/WindowsKernelVulunerabilities/image-20230106101933372.png)
+  ```cmd
+  powershell
+  driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object 'Display Name', 'Start Mode', Path
+  ```
 
   ※停止とマークされていても、カーネルメモリ空間にロードされているため、まだ対話できる可能性がある
 
@@ -55,6 +58,26 @@ systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
   Fixed Version    - 0day
   Fixed driver ver - 0day
   ```
+
+  以下powershellのコマンドでも確認可能
+
+  ```powershell
+  Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
+  
+  ----
+  PS C:\Users\offsec.CLIENT251> Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion,
+  Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
+  
+  DeviceName               DriverVersion Manufacturer
+  ----------               ------------- ------------
+  VMware VMCI Host Device  9.8.6.0       VMware, Inc.
+  VMware PVSCSI Controller 1.3.10.0      VMware, Inc.
+  VMware SVGA 3D           8.16.1.24     VMware, Inc.
+  VMware VMCI Bus Device   9.8.6.0       VMware, Inc.
+  VMware Pointing Device   12.5.7.0      VMware, Inc.
+  ```
+
+  
 
 * 該当バージョンのドライバがインストールされているか確認する
 
