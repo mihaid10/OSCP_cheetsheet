@@ -1,5 +1,7 @@
 # PasswordAttacks
 
+[toc]
+
 ## wordlistの作成(cewl)
 
 ```
@@ -275,4 +277,15 @@ cewlで作成したパスワードリストを設定する
 攻撃をスタートする。応答の長さで判断する
 
 ![image-20230224220226256](img/PasswordAttacks/image-20230224220226256.png)
+
+### Group.xml(windows)
+
+https://vk9-sec.com/exploiting-gpp-sysvol-groups-xml/
+
+![image-20230425233309512](img/PasswordAttacks/image-20230425233309512.png)
+
+```bash
+┌──(kali㉿kali)-[~/Documents/HTB/Active]
+└─$ gpp-decrypt "edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ"
+```
 

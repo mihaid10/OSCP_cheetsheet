@@ -96,8 +96,9 @@ net user
 
 * 書き込み可能なファイルの列挙
 
-  ```
+  ```cmd
   accesschk.exe -uws "Everyone" "C:\Program Files"
+  accesschk64.exe -accepteula -uws "Everyone" "C:\Program Files"
   ```
 
   * -u：エラーを抑制

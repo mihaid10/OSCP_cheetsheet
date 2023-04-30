@@ -1,5 +1,7 @@
 # NetBIOS(139)
 
+[toc]
+
 ### nbtscan
 
 有効なNetBIOS名をNetBIOSネームサービスに問い合わせる
@@ -60,11 +62,22 @@ sudo vi /etc/samba/smb.conf
 
 
 
-### smbmap（共有フォルダのpermissionをチェック）
+### smbmap
 
-```
+permissonをチェック
+
+```bash
 smbmap -H 10.11.1.115 -P 139 
 ```
+
+共有フォルダの列挙
+
+```bash
+＃smbmap -R <共有名> -H </etc/hostsに設定したホスト名 or IP>
+smbmap -R Replication -H active.htb
+```
+
+![image-20230423195843748](img/NetBIOS(139)/image-20230423195843748.png)
 
 
 
@@ -73,6 +86,7 @@ smbmap -H 10.11.1.115 -P 139
 ```bash
 smbclient //10.11.1.115/IPC$/
 smbclient -L 10.11.1.115
+smbclient -U svc_tgs //active.htb/Users
 ```
 
 

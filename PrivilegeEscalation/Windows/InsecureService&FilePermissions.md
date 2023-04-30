@@ -12,6 +12,8 @@
 
 ```cmd
 accesschk.exe -uws "Everyone" "C:\Program Files"
+accesschk64.exe -uws "Everyone" "C:\Program Files"
+accesschk64.exe /accepteula -uws "Everyone" "C:\Program Files"
 ```
 
 ```cmd
