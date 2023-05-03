@@ -2,15 +2,7 @@
 
 sweetpotateは包含的にpocを実行してくれるためまずはそちらを試す
 
-[前提確認](#前提確認)
-
-[実行(sweetpotate)](#実行(sweetpotate))
-
-[実行(juicypotate)](実行(juicypotate))
-
-[実行(roguepotate)](#実行(roguepotate))
-
-[参考サイト](#参考サイト)
+[toc]
 
 ### 前提確認
 
@@ -77,7 +69,7 @@ Testing {4991d34b-80a1-4291-83b6-3328366b9097} 5837
 
   **※whoami単体できちんとリバースシェル取得できるかをまず確認する**
 
-
+※ Windows Server 2008 R2でも実行できた。
 
 ### 実行(roguepotate)
 

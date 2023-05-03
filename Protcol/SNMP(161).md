@@ -1,5 +1,7 @@
 # SNMP(161)
 
+[toc]
+
 ### Simple Network Management Protocol
 
 * UDPベース
@@ -63,6 +65,7 @@ kali@kali:~$ onesixtyone -c community -i ips
 #### 全体検索（コミュニティ文字列は大体public)
 
 ```bash
+snmpwalk -Os -c public -v2c 10.129.228.122
 snmpwalk -c public -v1 -t 10 10.11.1.227
 ```
 
@@ -105,3 +108,11 @@ snmpwalk -c public -v1 10.11.1.227 1.3.6.1.2.1.25.6.3.1.2
 
 
 ### snmp-check
+
+網羅的にPC情報を収集してくれる。netstatの情報も確認ができる
+
+```bash
+snmp-check 10.129.228.122 -c public
+```
+
+![image-20230501094928071](img/SNMP(161)/image-20230501094928071.png)

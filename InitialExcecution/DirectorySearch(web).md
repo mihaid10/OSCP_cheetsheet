@@ -24,7 +24,7 @@ gobuster dir -u http://127.0.0.1:4444 -w /usr/share/wordlists/dirbuster/director
 * CGIがあるwebserver用のwordlistで実行
 
 ```bash
-gobuster dir -u http://10.11.1.71/ -w /usr/share/wordlists/dirb/vulns/cgis.txt -s '200,204,403,500' -e
+gobuster dir -u http://10.11.1.71/ -w /usr/share/wordlists/dirb/vulns/cgis.txt -s '200,204,403,500' -b ''
 ```
 
 -s：Positive status codes

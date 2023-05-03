@@ -82,4 +82,8 @@ https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20an
   /usr/bin/perl /tmp/alpha-shell.pl
   ```
 
-  
+
+
+### Invoke-PowerShellTcp.ps1
+
+[Invoke-PowerShellTcp.ps1](./Tools/powershell.md/#Nishang(Invoke-PowerShellTcp.ps1))

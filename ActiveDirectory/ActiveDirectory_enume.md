@@ -594,6 +594,20 @@ uploadが完了したらupload progressを閉じる
 
 * Analysisタブを適当にぽちぽちして目的のコンピューターやユーザを右クリックして`Mark user as Owned`に登録していく。
 
+  
+
+##### DCsyncを探す
+
+Find Principals with DCSync Rightsで見つかる場合がある
+
+![image-20230502162235526](img/ActiveDirectory_enume/image-20230502162235526.png)
+
+DCsyncを右クリックしてhelpを表示することでmimikatzのコマンドを確認することができる
+
+###### ![image-20230502162340161](img/ActiveDirectory_enume/image-20230502162340161.png)
+
+
+
 ### リモートサーバーからの情報収集
 
 LDAPを利用してグループの所属メンバーを確認

@@ -109,7 +109,15 @@ Service Info: Host: DC; OS: Windows 2008 R2
 ### ldapsearch
 
 ```bash
+ldapsearch -x -h 10.10.10.175 -s base namingcontexts
+ldapsearch -x -h 10.10.10.175 -b 'DC=EGOTISTICAL-BANK,DC=LOCAL'
 ldapsearch -H ldap://active.htb:389 -x -b "dc=active,dc=htb"
 ```
 
 [AD Enume_リモートサーバーからの情報収集](./../ActiveDirectory/ActiveDirectory_enume.md/#リモートサーバーからの情報収集)
+
+```bash
+# "remote management Users"の列挙
+ldapsearch -H ldap://10.129.192.240 -x -b DC=htb,DC=local | grep -A 11 -i "Remote Management Users"
+```
+

@@ -1,5 +1,7 @@
 # FTP
 
+[toc]
+
 ```
 ftp <ipアドレス>
 # ログイン情報がない時はとりあえずanonymousで試す
@@ -19,4 +21,12 @@ ftp> binary
 200 Type set to I.
 ftp> put accesschk.exe 
 ```
+
+FTPサーバーのファイルを再帰的に取得する
+
+```bash
+wget -r 'ftp://ftp_user:UTDRSCH53c"$6hys@10.129.1.183'
+```
+
+![image-20230501192434145](img/FTP(21)/image-20230501192434145.png)
 

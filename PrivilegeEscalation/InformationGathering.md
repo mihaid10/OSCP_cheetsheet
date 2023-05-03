@@ -136,17 +136,7 @@ net user
   Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
   ```
 
-* レジストリ設定「AlwaysInstallElevated48」の確認
-
-  ※このキーが有効 (1 に設定) の場合、すべてのユーザーが Windows Installer パッケージを昇格特権で実行できるようになる
-
-  ```cmd
-  c:\Users\student>reg query HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Installer
-  ```
-
-  ```cmd
-  c:\Users\student>reg query HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Installer
-  ```
+  
 
 * 所属グループの確認(整合性レベルの確認が可能)
 

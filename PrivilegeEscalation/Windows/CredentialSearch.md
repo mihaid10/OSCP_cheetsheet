@@ -1,5 +1,7 @@
 # CredentialSearch
 
+[toc]
+
 #### search for clear text credentials
 
 ```cmd
@@ -62,3 +64,30 @@ reg query "HKLM\SYSTEM\Current\ControlSet\Services\SNMP"
 reg query "HKCU\Software\SimonTatham\PuTTY\Sessions"
 ```
 
+
+
+### mRemoteNG.exe
+
+クレデンシャル情報を.xmlファイルに持つ
+
+```cmd
+dir "C:\Program Files (x86)"
+```
+
+```cmd
+cd C:\Users¥L4mpje\AppData\Roaming\mRemoteNG
+type confCons.xml
+```
+
+![image-20230502001102390](img/CredentialSearch/image-20230502001102390.png)
+
+パスワードクラックする
+
+https://github.com/kmahyyg/mremoteng-decrypt
+
+```
+git clone https://github.com/kmahyyg/mremoteng-decrypt.git
+cd mremoteng-decrypt 
+```
+
+![image-20230501235913351](img/CredentialSearch/image-20230501235913351.png)
